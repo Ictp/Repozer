@@ -36,10 +36,11 @@ STEP 1: Install Repoze staff
 ****************************
 - Install Repoze in your Indico instance:
     $ pip install repoze.catalog
-- Copy Repozer package in "<Indico path>/src/indico/ext/search/repozer"
+- go to "<Indico path>/src/indico/ext/search/" and do:
+    git clone https://github.com/Ictp/Repozer.git repozer
 - Edit "<Indico path>/src/setup.py", add @566: 
     search.repozer = indico.ext.search.repozer
-- Save and from shell:
+- Save and from shell in <Indico path>/src/:
     $ python setup.py develop
     
 
