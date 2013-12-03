@@ -130,7 +130,7 @@ according to your company needs. Take a look inside files of Repozer package:
 
 If you also want to be able to use Repozer in http_api for letting thirdy-party software to 
 make queries to Indico and receive XML/JSON output, you should ADD the code in:
-    api_extender.py
+    api_extender.py.txt
     
 to your:
 
