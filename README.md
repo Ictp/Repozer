@@ -164,5 +164,6 @@ Usable Parameters are:
 - category
 
 But you can easily edit the code to search for other fields, like in implementation.py
-Enjoy! :)
+
+**Enjoy! :)**
 
