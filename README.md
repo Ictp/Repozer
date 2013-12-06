@@ -77,7 +77,7 @@ this will create the inidico_catalog.fs (you should see percentage numbers)
 
 
 
-** Now your search engine is up-n-running! **
+**Now your search engine is up-n-running!**
 To make it updated with Events editing you can:
 
 1) put in CRON the createRepozeCatalog.py
