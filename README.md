@@ -148,17 +148,13 @@ EXTEND API.PY
 -------------
 
 
-If you also want to be able to use Repozer in http_api for letting thirdy-party software to 
-make queries to Indico and receive XML/JSON output, you should ADD the code in:
-    api_extender.py.txt
+You can also use Repozer with http_api for letting thirdy-party software to 
+make queries to Indico and receive XML/JSON output.
     
-to your:
+To understand it better, just take a look at http_api.py 
+E.g. you can make a call like this:
 
-    /indico/web/http_api/api.py
-    
-By doing this, you'll be able to call something like:
-
-http://192.168.0.25/indico/export/conference/search.xml?start_date=2013/01/01&keywords=Analysis,Applicable Mathematics
+http://<Indico URL>/indico/export/conference/search.xml?start_date=2013/01/01&keywords=Analysis,Applicable Mathematics
 
 Usable Parameters are:
 
@@ -168,4 +164,5 @@ Usable Parameters are:
 - category
 
 But you can easily edit the code to search for other fields, like in implementation.py
+Enjoy! :)
 
