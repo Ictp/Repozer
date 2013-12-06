@@ -18,7 +18,7 @@
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 from MaKaC.i18n import _
 
-from MaKaC.common import Config
+from indico.core.config import Config
 #currentPath = Config.getInstance().getConfigurationDir()  # DEPRECATED... :(
 
 
@@ -26,7 +26,7 @@ from MaKaC.common import Config
 globalOptions = [
     ("DBpath", {"description": "Repozer DB path",
                   "type": str,
-                  "defaultValue": "/opt/indico/data/db/indico_catalog.fs",
+                  "defaultValue": "/opt/indico/db/indico_catalog.fs",
                   "editable": True,
                   "visible": True}),
 ]
