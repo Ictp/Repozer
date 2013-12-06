@@ -30,19 +30,13 @@ from indico.core.extpoint import Component
 from indico.core.extpoint.plugins import IPluginImplementationContributor
 from indico.ext.search.repozer.implementation import RepozerSEA
 import indico.ext.search.repozer
-
-from indico.web.rh import RHHtdocs
-
 from MaKaC.plugins.base import PluginsHolder
+from indico.web.handlers import RHHtdocs
 
- 
-
+import inspect
 
 # PATCH FOR INDEXING
-
 from repozeIndexer import RepozeCatalog
-
-
 def reindex(conf):
     rc = RepozeCatalog()
     rc.reindex(conf)
@@ -50,6 +44,7 @@ def reindex(conf):
 
 # Class override from /MaKaC/services/implementation/conference.py
 import MaKaC.services.implementation.conference as conference
+
 class ConferenceTitleModificationRepozer( conference.ConferenceTitleModification ):
     """
     Conference title modification
@@ -86,13 +81,21 @@ class ConferenceStartEndDateTimeModificationRepozer( conference.ConferenceStartE
 
 
 
-class ConferenceRolesModificationRepozer(conference.ConferenceRolesModification):
-    """
-    Conference roles modification
-    """
-    def _handleSet(self):
-        conference.ConferenceRolesModification._handleSet(self)
-        reindex(self._target)
+defclasses = []
+for name, obj in inspect.getmembers(conference, inspect.isclass):
+    defclasses.append(name)
+
+
+if 'ConferenceRolesModification' in defclasses:
+    class ConferenceRolesModificationRepozer(conference.ConferenceRolesModification):
+        """
+        Conference roles modification
+        """
+        def _handleSet(self):
+            conference.ConferenceRolesModification._handleSet(self)
+            reindex(self._target)
+
+    conference.methodMap["main.changeRoles"] = ConferenceRolesModificationRepozer
 
 
 
@@ -100,7 +103,8 @@ conference.methodMap["main.changeTitle"] = ConferenceTitleModificationRepozer
 conference.methodMap["main.changeDescription"] = ConferenceDescriptionModificationRepozer
 conference.methodMap["main.changeKeywords"] = ConferenceKeywordsModificationRepozer
 conference.methodMap["main.changeDates"] = ConferenceStartEndDateTimeModificationRepozer
-conference.methodMap["main.changeRoles"] = ConferenceRolesModificationRepozer
+
+    
 
 
 
@@ -112,8 +116,10 @@ class PluginImplementationContributor(Component, Observable):
     """
 
     zope.interface.implements(IPluginImplementationContributor)
-
+        
     def getPluginImplementation(self, obj):
+        plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
+        #typeSearch = plugin.getOptions()["type"].getValue()
         return ("repozer", RepozerSEA)
 
 
