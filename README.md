@@ -153,7 +153,7 @@ To understand it better, just take a look at http_api.py
 E.g. you can make a call like this:
 
 ```
-http://<Indico URL>/indico/export/conference/search.xml?start_date=2013/01/01&keywords=Analysis,Applicable Mathematics\
+http://<Indico URL>/indico/export/conference/search.xml?start_date=2013/01/01&keywords=Analysis,Physics
 ```
 
 Usable Parameters are:
