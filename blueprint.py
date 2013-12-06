@@ -24,5 +24,4 @@ from indico.web.flask.wrappers import IndicoBlueprint
 blueprint = IndicoBlueprint('search-repozer', __name__, url_prefix='/repozer')
 
 blueprint.add_url_rule('/<path:filepath>', 'htdocs', handlers.RHSearchHtdocsRepozer)
-
 #blueprint.add_url_rule('/plugins/plugin/search/repozer/save-options', '', handlers.BuildRepozeCatalog)
