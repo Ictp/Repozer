@@ -78,17 +78,17 @@ this will create the inidico_catalog.fs (you should see percentage numbers)
 
 
 **Now your search engine is up-n-running!**
+
 To make it updated with Events editing you can:
 
 1) put in CRON the createRepozeCatalog.py
     - this will recreate the whole catalog everytime, but it should not take too long
 
-*OR*
+*OR BETTER*
 
 2) go below to OPTIONAL - STEP 3
     - this will make you edit a couple of source files so when an Event change the Repoze Catalog
     will change accordingly and will always be updated in realtime.
-
 
 
 
