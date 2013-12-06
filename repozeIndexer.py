@@ -14,14 +14,15 @@ from MaKaC.plugins.base import PluginsHolder
 from Utils import getRolesValues
 import html2text
 
-plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
-DBpath = plugin.getOptions()["DBpath"].getValue()
+
 indicize = True
 
 class RepozeCatalog():
 
     def __init__(self):
         if indicize:
+            plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
+            DBpath = plugin.getOptions()["DBpath"].getValue()
             self.factory = FileStorageCatalogFactory(DBpath,'indico_catalog')
             self.manager = ConnectionManager()
             self.catalog = self.factory(self.manager)
