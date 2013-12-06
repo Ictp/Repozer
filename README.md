@@ -144,17 +144,17 @@ according to your company needs. Take a look inside files of Repozer package:
 
 
 
-EXTEND API.PY
--------------
-
+HTTP_API.PY
+-----------
 
 You can also use Repozer with http_api for letting thirdy-party software to 
 make queries to Indico and receive XML/JSON output.
-    
 To understand it better, just take a look at http_api.py 
 E.g. you can make a call like this:
 
-http://<Indico URL>/indico/export/conference/search.xml?start_date=2013/01/01&keywords=Analysis,Applicable Mathematics
+```
+http://<Indico URL>/indico/export/conference/search.xml?start_date=2013/01/01&keywords=Analysis,Applicable Mathematics\
+```
 
 Usable Parameters are:
 
