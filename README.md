@@ -35,7 +35,9 @@ Otherwise, you will have to change your source files in
 STEP 1: Install Repoze staff
 ****************************
 - Install Repoze in your Indico instance:
-    $ pip install repoze.catalog
+```
+$ pip install repoze.catalog
+```
 - go to "<Indico path>/src/indico/ext/search/" and do:
     git clone https://github.com/Ictp/Repozer.git repozer
 - Edit "<Indico path>/src/setup.py", add @547 (right below "search.invenio = indico.ext.search.invenio")
