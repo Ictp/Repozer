@@ -5,7 +5,7 @@ Indico external module for integrated search engine based on repoze.catalog modu
 
 
 WHAT IS REPOZER 
-**********************************************
+---------------
 
 Repozer is an integration of repoze.catalog ( http://docs.repoze.org/catalog/ )
 into Indico as a search plug-in.
@@ -18,7 +18,7 @@ take a look at: http://docs.repoze.org/catalog/usage.html#searching
 
 
 INSTALLATION
-**********************************************
+------------
 
 Unfortunatly the installation procedure is not click-n-go, but you do it just once.
 
@@ -122,7 +122,7 @@ OPTIONAL - STEP 3: Update Indico source for Indexing
 
 
 BEWARE!
-**********************************************
+-------
 
 There are some things that you should notice:
 - Results pagination has been disabled and results are limited to 5000 
@@ -146,7 +146,7 @@ according to your company needs. Take a look inside files of Repozer package:
 
 
 EXTEND API.PY
-**********************************************
+-------------
 
 
 If you also want to be able to use Repozer in http_api for letting thirdy-party software to 
