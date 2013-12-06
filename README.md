@@ -35,17 +35,28 @@ Otherwise, you will have to change your source files in
 STEP 1: Install Repoze staff
 ****************************
 - Install Repoze in your Indico instance:
+
 ```
     $ pip install repoze.catalog
 ```
+
 - go to "<Indico path>/src/indico/ext/search/" and do:
+
 ```
     git clone https://github.com/Ictp/Repozer.git repozer
 ```
+
 - Edit "<Indico path>/src/setup.py", add @547 (right below "search.invenio = indico.ext.search.invenio")
+
+```
     search.repozer = indico.ext.search.repozer
+```
+
 - Save and from shell in <Indico path>/src/:
+
+```
     $ python setup.py develop_config
+```
     
 
     
@@ -56,7 +67,11 @@ STEP 2: Configure and create Catalog
 - Enable Search plugin, Repozer, set default Sea = Repozer
 - Set Repozer DB path (*** CHECK IT!!! ***) and Save Settings
 - Via shell, go to "<Indico path>/src/indico/ext/search/repozer/manage" and type:
+
+```
     $ python createRepozeCatalog.py
+```
+
 this will create the inidico_catalog.fs (you should see percentage numbers)
 - chown (apache:apache or whatever) the indico_catalog.fs and related files
 
@@ -85,21 +100,23 @@ OPTIONAL - STEP 3: Update Indico source for Indexing
     search for "class RHConferencePerformCreation"
     in method "def _createEvent(self, params):"
     just BEFORE "return c", add:
-    
+
+```    
         from indico.ext.search.repozer.repozeIndexer import RepozeCatalog
         rc = RepozeCatalog()
         rc.index(c)          
-
+```
 - edit "MaKaC/common/indexes.py"
 
     search for "class CategoryIndex"
     in method "unindexConf(self, conf):"
     at the END add:
-    
+
+```    
         from indico.ext.search.repozer.repozeIndexer import RepozeCatalog
         rc = RepozeCatalog()
         rc.unindex(conf)
-
+```
 
 
 
