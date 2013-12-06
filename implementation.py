@@ -22,7 +22,7 @@ import os, re, datetime, cgi, time, copy
 from indico.ext.search.base.implementation import SearchEngineCallAPIAdapter, Author, SearchResult, SubContributionEntry, ContributionEntry, ConferenceEntry, SEATranslator
 import indico.ext.search.repozer
 import MaKaC.conference as conference
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.common.output import XSLTransformer
 from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
@@ -47,7 +47,7 @@ import html2text
 SEA = SEATranslator("repozer")
 
 #plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
-#print "QUI",plugin.getOptions()["DBinit"].getValue()
+#print "DBinit",plugin.getOptions()["DBinit"].getValue()
 
 class RepozerSearchResult(SearchResult):
     @classmethod
