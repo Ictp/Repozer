@@ -22,8 +22,8 @@ INSTALLATION
 
 Unfortunatly the installation procedure is not click-n-go, but you do it just once.
 
-PRESEQUISITES:
-**************
+### PRESEQUISITES:
+
 We strongly suggest you to install your Indico instance from SOURCE: 
     http://indico-software.org/wiki/Dev/GettingStarted
 Otherwise, you will have to change your source files in 
@@ -32,8 +32,8 @@ Otherwise, you will have to change your source files in
     
 
 
-STEP 1: Install Repoze staff
-****************************
+### STEP 1: Install Repoze staff
+
 - Install Repoze in your Indico instance:
 
 ```
@@ -60,8 +60,8 @@ STEP 1: Install Repoze staff
     
 
     
-STEP 2: Configure and create Catalog
-************************************    
+### STEP 2: Configure and create Catalog
+
 - Start Indico    
 - Enter Admin web interface, Plugins
 - Enable Search plugin, Repozer, set default Sea = Repozer
@@ -74,7 +74,6 @@ STEP 2: Configure and create Catalog
 
 this will create the inidico_catalog.fs (you should see percentage numbers)
 - chown (apache:apache or whatever) the indico_catalog.fs and related files
-
 
 
 
@@ -93,8 +92,8 @@ To make it updated with Events editing you can:
 
 
 
-OPTIONAL - STEP 3: Update Indico source for Indexing
-****************************************************
+### OPTIONAL - STEP 3: Update Indico source for Indexing
+
 - edit "MaKaC/webinterface/rh/categoryDisplay.py"
     
     search for "class RHConferencePerformCreation"
@@ -131,8 +130,8 @@ There are some things that you should notice:
 - You can add/edit indexing by editing repozeIndexer.py and createRepozeCatalog.py
 
 
-SPECIFIC CUSTOMIZATION:
-***********************
+### SPECIFIC CUSTOMIZATION:
+
 Because of Repozer has been developed by Ictp, there are few customization you should change 
 according to your company needs. Take a look inside files of Repozer package: 
 - implementation.py : lines 328 and 355
