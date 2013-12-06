@@ -50,8 +50,8 @@ STEP 2: Configure and create Catalog
 - Start Indico    
 - Enter Admin web interface, Plugins
 - Enable Search plugin, Repozer, set default Sea = Repozer
-- Set Repozer DB path and Save Settings
-- Via shell, go to "<Indico path>/src/indico/ext/search/repozer" and type:
+- Set Repozer DB path (*** CHECK IT!!! ***) and Save Settings
+- Via shell, go to "<Indico path>/src/indico/ext/search/repozer/manage" and type:
     $ python createRepozeCatalog.py
 this will create the inidico_catalog.fs (you should see percentage numbers)
 - chown (apache:apache or whatever) the indico_catalog.fs and related files
