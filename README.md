@@ -101,9 +101,13 @@ To make it updated with Events editing you can:
     just BEFORE "return c", add:
 
 ```    
-        from indico.ext.search.repozer.repozeIndexer import RepozeCatalog
-        rc = RepozeCatalog()
-        rc.index(c)          
+        from indico.ext.search.register import SearchRegister
+        defaultSearchEngine = SearchRegister().getDefaultSearchEngineAgent()
+        if defaultSearchEngine is not None and defaultSearchEngine.isActive():
+            if SearchRegister().getDefaultSearchEngineAgentName() == 'repozer':
+                from indico.ext.search.repozer.repozeIndexer import RepozeCatalog
+                rc = RepozeCatalog()
+                rc.index(c)           
 ```
 - edit "MaKaC/common/indexes.py"
 
@@ -112,9 +116,14 @@ To make it updated with Events editing you can:
     at the END add:
 
 ```    
-        from indico.ext.search.repozer.repozeIndexer import RepozeCatalog
-        rc = RepozeCatalog()
-        rc.unindex(conf)
+        from indico.ext.search.register import SearchRegister
+        defaultSearchEngine = SearchRegister().getDefaultSearchEngineAgent()
+        if defaultSearchEngine is not None and defaultSearchEngine.isActive():
+            if SearchRegister().getDefaultSearchEngineAgentName() == 'repozer':
+                from indico.ext.search.repozer.repozeIndexer import RepozeCatalog
+                rc = RepozeCatalog()
+                rc.unindex(c) 
+
 ```
 
 
