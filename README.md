@@ -122,7 +122,7 @@ To make it updated with Events editing you can:
             if SearchRegister().getDefaultSearchEngineAgentName() == 'repozer':
                 from indico.ext.search.repozer.repozeIndexer import RepozeCatalog
                 rc = RepozeCatalog()
-                rc.unindex(c) 
+                rc.unindex(conf) 
 
 ```
 
