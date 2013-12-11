@@ -10,7 +10,7 @@ WHAT IS REPOZER
 Repozer is an integration of repoze.catalog ( http://docs.repoze.org/catalog/ )
 into Indico as a search plug-in.
 Indico comes with few integrated search functionality (search for Categories, not Events).
-Repozer gives you the ability to search inside Events directly in Indico, without any external tools.
+Repozer gives you the ability to search inside Events directly in Indico, without external tools.
 Searching with repoze.catalog is very easy and powerful, if you need some customized query just
 take a look at: http://docs.repoze.org/catalog/usage.html#searching
 
