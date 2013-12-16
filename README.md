@@ -76,55 +76,7 @@ this will create the inidico_catalog.fs (you should see percentage numbers)
 - chown (apache:apache or whatever) the indico_catalog.fs and related files
 
 
-
 **Now your search engine is up-n-running!**
-
-To make it updated with Events editing you can:
-
-1) put in CRON the createRepozeCatalog.py
-    - this will recreate the whole catalog everytime, but it should not take too long
-
-*OR BETTER*
-
-2) go below to OPTIONAL - STEP 3
-    - this will make you edit a couple of source files so when an Event change the Repoze Catalog
-    will change accordingly and will always be updated in realtime.
-
-
-
-### OPTIONAL - STEP 3: Update Indico source for Indexing
-
-- edit "MaKaC/webinterface/rh/categoryDisplay.py"
-    
-    search for "class RHConferencePerformCreation"
-    in method "def _createEvent(self, params):"
-    just BEFORE "return c", add:
-
-```    
-        from indico.ext.search.register import SearchRegister
-        defaultSearchEngine = SearchRegister().getDefaultSearchEngineAgent()
-        if defaultSearchEngine is not None and defaultSearchEngine.isActive():
-            if SearchRegister().getDefaultSearchEngineAgentName() == 'repozer':
-                from indico.ext.search.repozer.repozeIndexer import RepozeCatalog
-                rc = RepozeCatalog()
-                rc.index(c)           
-```
-- edit "MaKaC/common/indexes.py"
-
-    search for "class CategoryIndex"
-    in method "unindexConf(self, conf):"
-    at the END add:
-
-```    
-        from indico.ext.search.register import SearchRegister
-        defaultSearchEngine = SearchRegister().getDefaultSearchEngineAgent()
-        if defaultSearchEngine is not None and defaultSearchEngine.isActive():
-            if SearchRegister().getDefaultSearchEngineAgentName() == 'repozer':
-                from indico.ext.search.repozer.repozeIndexer import RepozeCatalog
-                rc = RepozeCatalog()
-                rc.unindex(conf) 
-
-```
 
 
 
