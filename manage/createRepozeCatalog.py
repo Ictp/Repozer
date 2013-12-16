@@ -121,7 +121,7 @@ def buildCatalog(DBpath):
                 #h.ignore_images = True
                 try:
                     #s = h.handle(conf.getDescription().decode('utf8','ignore'))
-                    s = html.fromstring(conf.getDescription()).text_content().decode('utf8','ignore')
+                    s = html.fromstring(conf.getDescription()).text_content()
                     s = s.encode('ascii','ignore')
                 except:
                     s = conf.getDescription()
