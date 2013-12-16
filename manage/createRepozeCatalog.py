@@ -1,6 +1,27 @@
-#!../bin/python
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of Indico.
+## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+##
+## Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 3 of the
+## License, or (at your option) any later version.
+##
+## Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core import db
+try:
+    from indico.core import db
+except:
+    from MaKaC.common import db
+
 from MaKaC.conference import CategoryManager, ConferenceHolder
 
 from repoze.catalog.catalog import FileStorageCatalogFactory
@@ -18,7 +39,8 @@ from BTrees.OOBTree import OOBTree
 from MaKaC.plugins.base import PluginsHolder
 from indico.ext.search.repozer.Utils import getRolesValues
 
-import indico.ext.search.repozer.html2text as html2text
+#import indico.ext.search.repozer.html2text as html2text
+from lxml import html
 
 db.DBMgr.getInstance().startRequest()
 plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
@@ -94,11 +116,12 @@ def buildCatalog(DBpath):
                 conf._rolesVals = getRolesValues(conf) 
                 conf._titleSorter = str(conf.title).lower().replace(" ", "") 
             
-                h = html2text.HTML2Text()
-                h.ignore_links = True
-                h.ignore_images = True
+                #h = html2text.HTML2Text()
+                #h.ignore_links = True
+                #h.ignore_images = True
                 try:
-                    s = h.handle(conf.getDescription().decode('utf8','ignore'))
+                    #s = h.handle(conf.getDescription().decode('utf8','ignore'))
+                    s = html.fromstring(c.getDescription()).text_content()
                     s = s.encode('ascii','ignore')
                 except:
                     s = conf.getDescription()
