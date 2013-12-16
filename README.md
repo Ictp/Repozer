@@ -20,7 +20,6 @@ take a look at: http://docs.repoze.org/catalog/usage.html#searching
 INSTALLATION
 ------------
 
-Unfortunatly the installation procedure is not click-n-go, but you do it just once.
 
 ### PRESEQUISITES:
 
@@ -65,7 +64,7 @@ Otherwise, you will have to change your source files in
 - Start Indico    
 - Enter Admin web interface, Plugins
 - Enable Search plugin, Repozer, set default Sea = Repozer
-- Set Repozer DB path (*** CHECK IT!!! ***) and Save Settings
+- Set Repozer DB path (***CHECK IT!!!***) and Save Settings
 - Via shell, go to "<Indico path>/src/indico/ext/search/repozer/manage" and type:
 
 ```
