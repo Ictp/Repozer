@@ -4,15 +4,15 @@
 ## This file is added for Indexing Indico's contents with repoze.catalog
 ## Copyright (C) 2013 Ictp.
 
-# OP ADDED: INDEX NEW CONFERENCE
+# INDEX NEW CONFERENCE
 from repoze.catalog.catalog import FileStorageCatalogFactory
 from repoze.catalog.catalog import ConnectionManager
-import transaction
-#from repoze.catalog.query import *
 from MaKaC.plugins.base import PluginsHolder
+import transaction
 
 from Utils import getRolesValues
-import html2text
+#import html2text
+from lxml import html
 
 
 indicize = True
@@ -32,11 +32,12 @@ class RepozeCatalog():
         c._listKeywords = c._keywords.split('\n')
         c._rolesVals = getRolesValues(c)
         c._titleSorter = str(c.title).lower().replace(" ", "")
-        h = html2text.HTML2Text()
-        h.ignore_links = True
-        h.ignore_images = True
+        #h = html2text.HTML2Text()
+        #h.ignore_links = True
+        #h.ignore_images = True
         try:
-            s = h.handle(c.getDescription().decode('utf8','ignore'))
+            #s = h.handle(c.getDescription().decode('utf8','ignore'))
+            s = html.fromstring(c.getDescription()).text_content()
             s = s.encode('ascii','ignore')
         except:
             s = c.getDescription()
