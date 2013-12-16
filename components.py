@@ -27,65 +27,28 @@ from MaKaC.plugins.base import Observable
 
 # indico imports
 from indico.core.extpoint import Component
+from indico.core.extpoint.events import IObjectLifeCycleListener, IMetadataChangeListener
 from indico.core.extpoint.plugins import IPluginImplementationContributor
 from indico.ext.search.repozer.implementation import RepozerSEA
+from indico.ext.search.repozer.repozeIndexer import RepozeCatalog
 import indico.ext.search.repozer
 from MaKaC.plugins.base import PluginsHolder
 from indico.web.handlers import RHHtdocs
-
 import inspect
-
-# PATCH FOR INDEXING
 from repozeIndexer import RepozeCatalog
-def reindex(conf):
-    rc = RepozeCatalog()
-    rc.reindex(conf)
+from indico.ext.search.register import SearchRegister
+from zope.interface import implements
 
 
-# Class override from /MaKaC/services/implementation/conference.py
+
+
 import MaKaC.services.implementation.conference as conference
 
-class ConferenceTitleModificationRepozer( conference.ConferenceTitleModification ):
-    """
-    Conference title modification
-    """
-    def _handleSet(self):
-        conference.ConferenceTitleModification._handleSet(self)
-        reindex(self._target)
 
-class ConferenceDescriptionModificationRepozer( conference.ConferenceDescriptionModification ):
-    """
-    Conference description modification
-    """
-    def _handleSet(self):
-        conference.ConferenceDescriptionModification._handleSet(self)
-        reindex(self._target)
-
-
-class ConferenceKeywordsModificationRepozer( conference.ConferenceKeywordsModification ):
-    """
-    Conference keywords modification
-    """
-    def _handleSet(self):
-        conference.ConferenceKeywordsModification._handleSet(self)
-        reindex(self._target)
-
-
-class ConferenceStartEndDateTimeModificationRepozer( conference.ConferenceStartEndDateTimeModification ):
-    """
-    Conference start date/time modification
-    """
-    def _getAnswer(self):
-        conference.ConferenceStartEndDateTimeModification._getAnswer(self)
-        reindex(self._target)
-
-
-
+# This is just until ROLES will be integrated in Indico with hook on event listener
 defclasses = []
 for name, obj in inspect.getmembers(conference, inspect.isclass):
     defclasses.append(name)
-
-
 if 'ConferenceRolesModification' in defclasses:
     class ConferenceRolesModificationRepozer(conference.ConferenceRolesModification):
         """
@@ -93,22 +56,59 @@ if 'ConferenceRolesModification' in defclasses:
         """
         def _handleSet(self):
             conference.ConferenceRolesModification._handleSet(self)
-            reindex(self._target)
-
+            rc = RepozeCatalog()
+            rc.reindex(self._target)
     conference.methodMap["main.changeRoles"] = ConferenceRolesModificationRepozer
 
 
 
-conference.methodMap["main.changeTitle"] = ConferenceTitleModificationRepozer
-conference.methodMap["main.changeDescription"] = ConferenceDescriptionModificationRepozer
-conference.methodMap["main.changeKeywords"] = ConferenceKeywordsModificationRepozer
-conference.methodMap["main.changeDates"] = ConferenceStartEndDateTimeModificationRepozer
+# This should be removed...
+# Class override from /MaKaC/services/implementation/conference.py
+class ConferenceKeywordsModificationRepozer( conference.ConferenceKeywordsModification ):
+    """
+    Conference keywords modification
+    """
+    def _handleSet(self):
+        conference.ConferenceKeywordsModification._handleSet(self)
+        rc = RepozeCatalog()
+        rc.reindex(self._target)
+conference.methodMap["main.changeKeywords"] = ConferenceKeywordsModificationRepozer        
 
-    
 
 
 
+class ObjectChangeListener(Component):
+    """
+    This component listens for events and directs them to the MPT.
+    Implements ``IObjectLifeCycleListener``,``IMetadataChangeListener``
+    """
 
+    implements(IMetadataChangeListener, IObjectLifeCycleListener)
+
+    def created(self, obj, owner):        
+        rc = RepozeCatalog()
+        rc.index(obj) 
+
+    def moved(self, obj, fromOwner, toOwner):
+        rc = RepozeCatalog()
+        rc.reindex(obj) 
+
+    def deleted(self, obj, oldOwner):
+        rc = RepozeCatalog()
+        rc.unindex(obj) 
+
+    def eventTitleChanged(self, obj, oldTitle, newTitle):
+        rc = RepozeCatalog()
+        rc.reindex(obj) 
+
+    def infoChanged(self, obj):
+        rc = RepozeCatalog()
+        rc.reindex(obj) 
+        
+    def eventDatesChanged(cls, obj, oldStartDate, oldEndDate, newStartDate, newEndDate):
+        rc = RepozeCatalog()
+        rc.reindex(obj) 
+                          
 
 class PluginImplementationContributor(Component, Observable):
     """
