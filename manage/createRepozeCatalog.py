@@ -108,7 +108,7 @@ def buildCatalog(DBpath):
                 pass
             if (c != None):
                 # Ictp conferences Id starts with an 'a' char: need to be removed
-                intId = int(conf.getId().replace('a','9999'))
+                intId = int(str(conf.getId()).replace('a','9999'))
                 conf._catName = [str(cat.name)]            
                 if len(conf._keywords)>0: 
                     conf._listKeywords = conf._keywords.split('\n')
