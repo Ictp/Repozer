@@ -28,7 +28,7 @@ class RepozeCatalog():
             self.catalog = self.factory(self.manager)
     
     def fixIndexes(self, c):
-        c._intId = int(c.getId().replace('a',''))
+        c._intId = int(str(c.getId()).replace('a',''))
         c._listKeywords = c._keywords.split('\n')
         c._rolesVals = getRolesValues(c)
         c._titleSorter = str(c.title).lower().replace(" ", "")
