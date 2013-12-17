@@ -102,8 +102,9 @@ class ObjectChangeListener(Component):
         rc.reindex(obj) 
 
     def infoChanged(self, obj):
-        rc = RepozeCatalog()
-        rc.reindex(obj) 
+        if obj.getId() != '':
+            rc = RepozeCatalog()
+            rc.reindex(obj) 
         
     def eventDatesChanged(cls, obj, oldStartDate, oldEndDate, newStartDate, newEndDate):
         rc = RepozeCatalog()
