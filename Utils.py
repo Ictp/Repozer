@@ -13,10 +13,10 @@ def getRolesValues(conf):
             lroles = eval(sroles)
             vals = []
             for r in lroles:
-                child = r['child']
+                child = r['child']                
                 for c in child:
-                    if hasattr(c,'familyName'):
+                    if 'familyName' in c:
                         vals.append(c['familyName'])
-                    if hasattr(c,'firstName'):
+                    if 'firstName' in c:
                         vals.append(c['firstName'])
     return ','.join(vals)
