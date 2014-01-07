@@ -56,14 +56,9 @@ class RepozerSearchResult(SearchResult):
 
 class ConferenceEntryRepozer(ConferenceEntry):
     def getDescriptionText(self):
-    
-        h = html2text.HTML2Text()
-        h.ignore_links = True
-        h.ignore_images = True
-        
         # this is to avoid partial HTML 
         try:
-            s = h.handle(self.getDescription().decode('utf8','ignore'))
+            s = html.fromstring(c.getDescription()).text_content()
             s = s.encode('ascii','ignore')
         except:
             s = self.getDescription()
