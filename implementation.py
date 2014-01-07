@@ -42,7 +42,7 @@ from datetime import datetime
 import time
 from pytz import timezone
 import MaKaC.common.info as info
-import html2text
+#import html2text
 
 SEA = SEATranslator("repozer")
 
