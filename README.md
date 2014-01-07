@@ -45,7 +45,7 @@ Otherwise, you will have to change your source files in
     git clone https://github.com/Ictp/Repozer.git repozer
 ```
 
-- Edit "<Indico path>/src/setup.py", add @547 (right below "search.invenio = indico.ext.search.invenio")
+- Edit "<Indico path>/src/setup.py", add @566 (right below "search.invenio = indico.ext.search.invenio")
 
 ```
     search.repozer = indico.ext.search.repozer
