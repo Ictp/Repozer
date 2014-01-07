@@ -23,7 +23,7 @@ class RepozeCatalog():
         self.manager = ConnectionManager()
         self.catalog = self.factory(self.manager)
     
-    def toIndicize(obj):
+    def toIndicize(self,obj):
         return type(obj).__name__ in typesToIndicize
     
     def fixIndexes(self, c):
