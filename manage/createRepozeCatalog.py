@@ -116,15 +116,13 @@ def buildCatalog(DBpath):
                 conf._rolesVals = getRolesValues(conf) 
                 conf._titleSorter = str(conf.title).lower().replace(" ", "") 
             
-                #h = html2text.HTML2Text()
-                #h.ignore_links = True
-                #h.ignore_images = True
-                try:
-                    #s = h.handle(conf.getDescription().decode('utf8','ignore'))
-                    s = html.fromstring(conf.getDescription()).text_content()
-                    s = s.encode('ascii','ignore')
-                except:
-                    s = conf.getDescription()
+                s = ''
+                if conf.getDescription(): 
+                    try:
+                        s = html.fromstring(conf.getDescription().decode('utf8','ignore')).text_content()
+                        s = s.encode('ascii','ignore')
+                    except: 
+                        s = conf.getDescription()
                 conf._descriptionText = s
                 catalog.index_doc(intId, conf)
         transaction.commit()
