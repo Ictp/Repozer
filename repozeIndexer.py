@@ -4,39 +4,34 @@
 ## This file is added for Indexing Indico's contents with repoze.catalog
 ## Copyright (C) 2013 Ictp.
 
-# INDEX NEW CONFERENCE
 from repoze.catalog.catalog import FileStorageCatalogFactory
 from repoze.catalog.catalog import ConnectionManager
 from MaKaC.plugins.base import PluginsHolder
 import transaction
 
 from Utils import getRolesValues
-#import html2text
 from lxml import html
 
-
-indicize = True
+typesToIndicize = ['Conference']
 
 class RepozeCatalog():
 
     def __init__(self):
-        if indicize:
-            plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
-            DBpath = plugin.getOptions()["DBpath"].getValue()
-            self.factory = FileStorageCatalogFactory(DBpath,'indico_catalog')
-            self.manager = ConnectionManager()
-            self.catalog = self.factory(self.manager)
+        plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
+        DBpath = plugin.getOptions()["DBpath"].getValue()
+        self.factory = FileStorageCatalogFactory(DBpath,'indico_catalog')
+        self.manager = ConnectionManager()
+        self.catalog = self.factory(self.manager)
+    
+    def toIndicize(obj):
+        return type(obj).__name__ in typesToIndicize
     
     def fixIndexes(self, c):
         c._intId = int(str(c.getId()).replace('a',''))
         c._listKeywords = c._keywords.split('\n')
         c._rolesVals = getRolesValues(c)
         c._titleSorter = str(c.title).lower().replace(" ", "")
-        #h = html2text.HTML2Text()
-        #h.ignore_links = True
-        #h.ignore_images = True
         try:
-            #s = h.handle(c.getDescription().decode('utf8','ignore'))
             s = html.fromstring(c.getDescription()).text_content()
             s = s.encode('ascii','ignore')
         except:
@@ -44,28 +39,28 @@ class RepozeCatalog():
         c._descriptionText = s
                 
     def index(self, c):
-        if indicize:
+        if self.toIndicize(c):
             self.fixIndexes(c)
             #c._catName = categoria di appartenenza
+            print "*****Indexing:",type(c).__name__
             self.catalog.index_doc(c._intId, c)
-            self.closeConnection()
+        self.closeConnection(c)
 
     def unindex(self, c):
-        if indicize:
+        if self.toIndicize(c):
             intId = int(c.getId().replace('a',''))
             self.catalog.unindex_doc(intId)
-            self.closeConnection()
+        self.closeConnection(c)
         
     def reindex(self, c):
-        if indicize:
+        if self.toIndicize(c):
             self.fixIndexes(c)
             self.catalog.reindex_doc(c._intId, c)        
-            self.closeConnection()        
+        self.closeConnection(c)        
         
-    def closeConnection(self):
-        if indicize:
+    def closeConnection(self, c):
+        if self.toIndicize(c):
             transaction.commit()              
-
         self.factory.db.close()
         self.manager.commit()        
         self.manager.close() 
