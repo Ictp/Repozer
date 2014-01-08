@@ -85,9 +85,9 @@ class ObjectChangeListener(Component):
 
     implements(IMetadataChangeListener, IObjectLifeCycleListener)
 
-    def created(self, obj, owner):        
-        rc = RepozeCatalog()
-        rc.index(obj) 
+    def created(self, obj, owner):
+        # DONT REALLY NEED IT: INFOCHANGED IS CALLED
+        pass
 
     def moved(self, obj, fromOwner, toOwner):
         rc = RepozeCatalog()

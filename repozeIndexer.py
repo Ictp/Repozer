@@ -7,6 +7,7 @@
 from repoze.catalog.catalog import FileStorageCatalogFactory
 from repoze.catalog.catalog import ConnectionManager
 from MaKaC.plugins.base import PluginsHolder
+from MaKaC.conference import ConferenceHolder
 import transaction
 import Utils as u
 
@@ -25,11 +26,11 @@ class RepozeCatalog():
         return type(obj).__name__ in typesToIndicize
     
     def fixIndexes(self, c):
-        c._intId = int(str(c.getId()).replace('a',''))
+        c._intId = int(str(c.getId()).replace('a','9999'))
         c._listKeywords = c._keywords.split('\n')
         c._rolesVals = u.getRolesValues(c)
         c._titleSorter = str(c.title).lower().replace(" ", "")
-        c._descriptionText = u.getTextFromHTML(c.getDescription())
+        c._descriptionText = u.getTextFromHtml(c.getDescription())
                 
     def index(self, c):
         if self.toIndicize(c):
@@ -38,16 +39,22 @@ class RepozeCatalog():
             self.catalog.index_doc(c._intId, c)
         self.closeConnection(c)
 
-    def unindex(self, c):
+    def unindex(self, c):        
         if self.toIndicize(c):
-            intId = int(c.getId().replace('a',''))
+            intId = int(str(c.getId()).replace('a','9999'))
             self.catalog.unindex_doc(intId)
         self.closeConnection(c)
         
     def reindex(self, c):
         if self.toIndicize(c):
-            self.fixIndexes(c)
-            self.catalog.reindex_doc(c._intId, c)        
+            # Check if conference still exist
+            ch = ConferenceHolder()        
+            cc = None
+            try: cc = ch.getById(c.id)
+            except: pass            
+            if cc:
+                self.fixIndexes(c)
+                self.catalog.reindex_doc(c._intId, c)        
         self.closeConnection(c)        
         
     def closeConnection(self, c):
