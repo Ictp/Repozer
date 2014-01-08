@@ -35,12 +35,8 @@ import transaction
 from persistent import Persistent
 from BTrees.OOBTree import OOBTree
 
-
 from MaKaC.plugins.base import PluginsHolder
-from indico.ext.search.repozer.Utils import getRolesValues
-
-#import indico.ext.search.repozer.html2text as html2text
-from lxml import html
+import Utils as u
 
 db.DBMgr.getInstance().startRequest()
 plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
@@ -113,17 +109,10 @@ def buildCatalog(DBpath):
                 if len(conf._keywords)>0: 
                     conf._listKeywords = conf._keywords.split('\n')
                 #conf._catId = cat.id            
-                conf._rolesVals = getRolesValues(conf) 
+                conf._rolesVals = u.getRolesValues(conf) 
                 conf._titleSorter = str(conf.title).lower().replace(" ", "") 
             
-                s = ''
-                if conf.getDescription(): 
-                    try:
-                        s = html.fromstring(conf.getDescription().decode('utf8','ignore')).text_content()
-                        s = s.encode('ascii','ignore')
-                    except: 
-                        s = conf.getDescription()
-                conf._descriptionText = s
+                conf._descriptionText = u.getTextFromHtml(conf.getDescription())
                 catalog.index_doc(intId, conf)
         transaction.commit()
         curnum += 1

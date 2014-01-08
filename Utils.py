@@ -3,6 +3,7 @@
 ##
 ## This file is added for Indexing Indico's contents with repoze.catalog
 ## Copyright (C) 2013 Ictp.
+from lxml import html
 
 def getRolesValues(conf):
     # convert roles to list of values only
@@ -20,3 +21,15 @@ def getRolesValues(conf):
                     if 'firstName' in c:
                         vals.append(c['firstName'])
     return ','.join(vals)
+
+
+def getTextFromHtml(txt):
+    s = ''
+    if txt: 
+        try:
+            s = html.fromstring(txt.decode('utf8','ignore')).text_content()
+            # Change this if you need different encoding
+            s = s.encode('ascii','ignore')
+        except: 
+            s = txt
+    return s

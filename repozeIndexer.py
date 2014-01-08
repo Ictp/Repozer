@@ -8,9 +8,7 @@ from repoze.catalog.catalog import FileStorageCatalogFactory
 from repoze.catalog.catalog import ConnectionManager
 from MaKaC.plugins.base import PluginsHolder
 import transaction
-
-from Utils import getRolesValues
-from lxml import html
+import Utils as u
 
 typesToIndicize = ['Conference']
 
@@ -29,20 +27,14 @@ class RepozeCatalog():
     def fixIndexes(self, c):
         c._intId = int(str(c.getId()).replace('a',''))
         c._listKeywords = c._keywords.split('\n')
-        c._rolesVals = getRolesValues(c)
+        c._rolesVals = u.getRolesValues(c)
         c._titleSorter = str(c.title).lower().replace(" ", "")
-        try:
-            s = html.fromstring(c.getDescription()).text_content()
-            s = s.encode('ascii','ignore')
-        except:
-            s = c.getDescription()
-        c._descriptionText = s
+        c._descriptionText = u.getTextFromHTML(c.getDescription())
                 
     def index(self, c):
         if self.toIndicize(c):
             self.fixIndexes(c)
             #c._catName = categoria di appartenenza
-            print "*****Indexing:",type(c).__name__
             self.catalog.index_doc(c._intId, c)
         self.closeConnection(c)
 

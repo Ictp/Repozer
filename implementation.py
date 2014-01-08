@@ -42,8 +42,7 @@ from datetime import datetime
 import time
 from pytz import timezone
 import MaKaC.common.info as info
-#import html2text
-from lxml import html
+import Utils as u
 
 SEA = SEATranslator("repozer")
 
@@ -58,14 +57,7 @@ class RepozerSearchResult(SearchResult):
 class ConferenceEntryRepozer(ConferenceEntry):
     def getDescriptionText(self):        
         # this is to avoid partial HTML 
-        s = ''
-        if self.getDescription(): 
-            try:
-                s = html.fromstring(self.getDescription().decode('utf8','ignore')).text_content()
-                s = s.encode('ascii','ignore')
-            except: 
-                s = self.getDescription()
-        return s
+        return u.getTextFromHtml(self.getDescription())
 
 class RepozerBaseSEA:
     _id = "repozer"
@@ -308,7 +300,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
             title = parameters['p']
             ts = title.split(" ")
             titleWilcard = "*"+"* *".join(ts)+"*"
-            print titleWilcard
+            #print titleWilcard
         if parameters['startDate'] != '':
             sdd,sdm,sdy = parameters['startDate'].split('/')
             startDate = timezone(tz).localize(datetime( int(sdy), int(sdm), int(sdd), 0, 0 ))  
