@@ -36,7 +36,7 @@ from persistent import Persistent
 from BTrees.OOBTree import OOBTree
 
 from MaKaC.plugins.base import PluginsHolder
-import Utils as u
+from indico.ext.search.repozer import Utils as u
 
 db.DBMgr.getInstance().startRequest()
 plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
