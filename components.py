@@ -39,10 +39,10 @@ from repozeIndexer import RepozeCatalog
 from indico.ext.search.register import SearchRegister
 from zope.interface import implements
 
-
-
-
 import MaKaC.services.implementation.conference as conference
+
+# TODO: move to options
+typesToIndicize = ['Conference']
 
 
 # This is just until ROLES will be integrated in Indico with hook on event listener
@@ -85,30 +85,32 @@ class ObjectChangeListener(Component):
 
     implements(IMetadataChangeListener, IObjectLifeCycleListener)
 
+    def toIndicize(self,obj):
+        return type(obj).__name__ in typesToIndicize
+
     def created(self, obj, owner):
-        # DONT REALLY NEED IT: INFOCHANGED IS CALLED
-        pass
+        if self.toIndicize(obj):
+            RepozeCatalog().index(obj)
 
     def moved(self, obj, fromOwner, toOwner):
-        rc = RepozeCatalog()
-        rc.reindex(obj) 
+        if self.toIndicize(obj):
+            RepozeCatalog().reindex(obj)
 
     def deleted(self, obj, oldOwner):
-        rc = RepozeCatalog()
-        rc.unindex(obj) 
-
+        if self.toIndicize(obj):
+            RepozeCatalog().unindex(obj)
+        
     def eventTitleChanged(self, obj, oldTitle, newTitle):
-        rc = RepozeCatalog()
-        rc.reindex(obj) 
+        if self.toIndicize(obj):
+            RepozeCatalog().reindex(obj)    
 
     def infoChanged(self, obj):
-        if obj.getId() != '':
-            rc = RepozeCatalog()
-            rc.reindex(obj) 
-        
+        if self.toIndicize(obj):
+            RepozeCatalog().reindex(obj)
+                
     def eventDatesChanged(cls, obj, oldStartDate, oldEndDate, newStartDate, newEndDate):
-        rc = RepozeCatalog()
-        rc.reindex(obj) 
+        if self.toIndicize(obj):
+            RepozeCatalog().reindex(obj)
                           
 
 class PluginImplementationContributor(Component, Observable):

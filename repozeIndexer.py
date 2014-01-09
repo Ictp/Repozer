@@ -11,19 +11,10 @@ from MaKaC.conference import ConferenceHolder
 import transaction
 import Utils as u
 
-typesToIndicize = ['Conference']
-
 class RepozeCatalog():
 
     def __init__(self):
-        plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
-        DBpath = plugin.getOptions()["DBpath"].getValue()
-        self.factory = FileStorageCatalogFactory(DBpath,'indico_catalog')
-        self.manager = ConnectionManager()
-        self.catalog = self.factory(self.manager)
-    
-    def toIndicize(self,obj):
-        return type(obj).__name__ in typesToIndicize
+        pass
     
     def fixIndexes(self, c):
         c._intId = int(str(c.getId()).replace('a','9999'))
@@ -33,33 +24,39 @@ class RepozeCatalog():
         c._descriptionText = u.getTextFromHtml(c.getDescription())
                 
     def index(self, c):
-        if self.toIndicize(c):
-            self.fixIndexes(c)
-            #c._catName = categoria di appartenenza
-            self.catalog.index_doc(c._intId, c)
+        self.openConnection()
+        self.fixIndexes(c)
+        #c._catName = categoria di appartenenza
+        self.catalog.index_doc(c._intId, c)
         self.closeConnection(c)
 
-    def unindex(self, c):        
-        if self.toIndicize(c):
-            intId = int(str(c.getId()).replace('a','9999'))
-            self.catalog.unindex_doc(intId)
+    def unindex(self, c):   
+        self.openConnection()     
+        intId = int(str(c.getId()).replace('a','9999'))
+        self.catalog.unindex_doc(intId)
         self.closeConnection(c)
         
     def reindex(self, c):
-        if self.toIndicize(c):
-            # Check if conference still exist
-            ch = ConferenceHolder()        
-            cc = None
-            try: cc = ch.getById(c.id)
-            except: pass            
-            if cc:
-                self.fixIndexes(c)
-                self.catalog.reindex_doc(c._intId, c)        
+        self.openConnection()     
+        # Check if conference still exist
+        ch = ConferenceHolder()        
+        cc = None
+        try: cc = ch.getById(c.id)
+        except: pass            
+        if cc:
+            self.fixIndexes(c)
+            self.catalog.reindex_doc(c._intId, c)        
         self.closeConnection(c)        
         
     def closeConnection(self, c):
-        if self.toIndicize(c):
-            transaction.commit()              
+        transaction.commit()              
         self.factory.db.close()
         self.manager.commit()        
         self.manager.close() 
+
+    def openConnection(self):
+        plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
+        DBpath = plugin.getOptions()["DBpath"].getValue()
+        self.factory = FileStorageCatalogFactory(DBpath,'indico_catalog')
+        self.manager = ConnectionManager()
+        self.catalog = self.factory(self.manager)
