@@ -120,10 +120,19 @@ Usable Parameters are:
 
 - start_date
 - end_date   
+- today (shows Conferences running, alternative for start/end_date)
 - keywords
 - category
 
 But you can easily edit the code to search for other fields, like in implementation.py
+To get richer Events data, you can change default DETAILS.
+E.g.:
+
+```
+http://<Indico URL>/indico/export/conference/search.xml?detail=contributions&today=2013/04/10
+```
+
+
 
 **Enjoy! :)**
 
