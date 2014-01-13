@@ -35,8 +35,10 @@ class SearchHook(HTTPAPIHook):
         super(SearchHook, self)._getParams()
         self._start_date = get_query_parameter(self._queryParams, ['start_date'], '1970/01/01')
         self._end_date = get_query_parameter(self._queryParams, ['end_date'], None)
+        self._today = get_query_parameter(self._queryParams, ['today'], None)
         self._category = get_query_parameter(self._queryParams, ['category'], None)
         self._keywords = get_query_parameter(self._queryParams, ['keywords'], None)
+        # To be implemented...
         self._text = get_query_parameter(self._queryParams, ['text'], None)
         
     def export_conference(self, aw):
@@ -63,15 +65,24 @@ class SearchFetcher(IteratedDataFetcher):
         
         localTimezone = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
         
-        sdate = params._start_date.split('/')
-        startDate_ts = timezone(localTimezone).localize(datetime(int(sdate[0]), int(sdate[1]), int(sdate[2]), 0, 0))
+        if params._start_date:
+            sdate = params._start_date.split('/')
+            startDate_ts = timezone(localTimezone).localize(datetime(int(sdate[0]), int(sdate[1]), int(sdate[2]), 0, 0))
         if params._end_date:
             edate = params._end_date.split('/')
             endDate_ts = timezone(localTimezone).localize(datetime(int(edate[0]), int(edate[1]), int(edate[2]), 23, 59))
         else:
             endDate_ts = None
         
-        query = InRange('startDate',startDate_ts, endDate_ts)
+        if params._start_date:
+            query = InRange('startDate',startDate_ts, endDate_ts)
+
+        if params._today:
+            td = params._today.split('/')
+            today_ts = timezone(localTimezone).localize(datetime(int(td[0]), int(td[1]), int(td[2]), 0, 0))
+            query = Lt('startDate',today_ts) & Gt('endDate',today_ts)
+            
+            
         
         if params._keywords:
             kw = params._keywords.split(',')
