@@ -108,7 +108,7 @@ HTTP_API.PY
 -----------
 
 You can also use Repozer with http_api for letting thirdy-party software to 
-make queries to Indico and receive XML/JSON output.
+make queries to Indico and receive XML/JSON (form JSON use 'search.json') output.
 To understand it better, just take a look at http_api.py 
 E.g. you can make a call like this:
 
@@ -129,7 +129,7 @@ To get richer Events data, you can change default DETAILS.
 E.g.:
 
 ```
-http://<Indico URL>/indico/export/conference/search.xml?detail=contributions&today=2013/04/10
+http://<Indico URL>/indico/export/conference/search.json?detail=contributions&today=2013/04/10
 ```
 
 
