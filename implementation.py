@@ -287,6 +287,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         
         title = ''
         titleWilcard = ''
+        searchSMR = False
         startDate = None
         endDate = None
         sortField = 'startDate'
@@ -297,10 +298,15 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         #print "PARAM=",parameters
 
         if parameters['p'] != '':
-            title = parameters['p']
-            ts = title.split(" ")
-            titleWilcard = "*"+"* *".join(ts)+"*"
-            #print titleWilcard
+            # Ictp specific:
+            if parameters['p'].startswith('smr'):
+                searchSMR = True
+                keywords = parameters['p'].replace(' ','')
+            else:                  
+                title = parameters['p']
+                ts = title.split(" ")
+                titleWilcard = "*"+"* *".join(ts)+"*"
+                #print titleWilcard
         if parameters['startDate'] != '':
             sdd,sdm,sdy = parameters['startDate'].split('/')
             startDate = timezone(tz).localize(datetime( int(sdy), int(sdm), int(sdd), 0, 0 ))  
@@ -334,12 +340,16 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
             query = Eq('description', titleWilcard) | Eq('title', titleWilcard)
         elif parameters['f'] == 'roles':
             query = Contains('rolesVals', title)                
-        if (categories != []):
+        if categories != []:
             query = query & Any('category', categories)        
-        if (keywords != []):
+        if keywords != []:
             query = query & Any('keywords', keywords)
                             
-        query = query & InRange('startDate',startDate, endDate)    
+        query = query & InRange('startDate',startDate, endDate)  
+        # Ictp specific:
+        if searchSMR:
+            query = Any('keywords', keywords)
+          
         numdocs, results = catalog.query(query, sort_index=sortField, reverse=sortReverse, limit=self._pagination)
 
         # Ictp specific: have to replace 9999 with 'a' 
