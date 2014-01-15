@@ -2,8 +2,11 @@ import sys, getopt
 from indico.core import db
 
 from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
-from indico.web.http_api.fossils import IConferenceMetadataFossil, IConferenceMetadataWithContribsFossil, \
-    IConferenceMetadataWithSubContribsFossil, IConferenceMetadataWithSessionsFossil
+from indico.web.http_api.fossils import IConferenceMetadataFossil, IConferenceMetadataWithSubContribsFossil, \
+    IConferenceMetadataWithSessionsFossil
+try: from indico.web.http_api.fossils import IConferenceMetadataWithContribsAndBreaksFossil as IContribFossil
+except: from indico.web.http_api.fossils import IConferenceMetadataWithContribsFossil as IContribFossil
+
 from indico.web.http_api.util import get_query_parameter
 from MaKaC.conference import ConferenceHolder
 
@@ -49,7 +52,7 @@ class SearchHook(HTTPAPIHook):
 class SearchFetcher(IteratedDataFetcher):
     DETAIL_INTERFACES = {
         'events': IConferenceMetadataFossil,
-        'contributions': IConferenceMetadataWithContribsFossil,
+        'contributions': IContribFossil,        
         'subcontributions': IConferenceMetadataWithSubContribsFossil,
         'sessions': IConferenceMetadataWithSessionsFossil
     }
