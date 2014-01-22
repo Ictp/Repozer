@@ -11,15 +11,7 @@
     % if not isinstance(result.getTarget(),MaKaC.conference.Conference):
          <span style="display: block; font-style:italic; font-size:x-small;">${ result.getConference().getTitle()}</span>
     %endif
-    <ul class="authorList">
-        % for author in result.getAuthors():
-            <li ${'class="last"' if author == result.getAuthors()[-1] else ""}>
-                ${ author.getName() }
-                <small>(${ author.getRole() } ${", %s"%author.getAffiliation() if author.getAffiliation() else ""})</small>
-            </li>
-        % endfor
-    </ul>
-
+    
 <%
 if result.getDescription() != None:
     fullDesc = result.getDescription()
