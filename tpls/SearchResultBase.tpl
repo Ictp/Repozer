@@ -120,8 +120,10 @@
         }
     });
 
-    $('#startDatePlace').datepicker({ dateFormat: "dd/mm/yy", firstDay: 1, defaultDate:"${startDate}"});
-    $('#endDatePlace').datepicker({ dateFormat: "dd/mm/yy",  firstDay: 1, defaultDate:"${endDate}"  });
+    $("#startDatePlace").datepicker({ dateFormat: "dd/mm/yy", firstDay: 1, defaultDate:"${startDate}",changeMonth: true,
+      changeYear: true});
+    $("#endDatePlace").datepicker({ dateFormat: "dd/mm/yy",  firstDay: 1, defaultDate:"${endDate}",changeMonth: true,
+      changeYear: true});
     
     
 </script>
