@@ -25,9 +25,4 @@ else:
     </div>
 
 
-    <ul class="nobulletsListInline" style="margin-top: 5px; margin-left: 20px;">
-        % for material in result.getMaterials():
-        <li><a class="searchResultLink" href="${ material[0] }">${ material[1] }</a></li>
-        % endfor
-    </ul>
 </li>

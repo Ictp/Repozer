@@ -4,11 +4,13 @@
     <tr>
     <td style="text-align: right;">${ _("Search for")}</td>
     <td>
-        <select name="collections">
-          <option value="Events">Events</option>
-          <!--<option value="Contributions">Contributions</option>-->
-          <!--<option value="" selected>Both (Events+Contributions)</option>-->
-        </select>
+
+            <select class="UIFieldSpan" name="collections">
+                <option value="" ${"selected" if collections=="" else ""}>${ _("Events")}</option>
+                <option value="Contribution" ${"selected" if collections=="Contribution" else ""}>${ _("Contributions")}</option>
+                <!--<option value="Material" ${"selected" if collections=="Material" else ""}>${ _("Materials")}</option>-->
+                <option value="All" ${"selected" if collections=="All" else ""}>${ _("All")}</option>
+            </select>
     </td>
     </tr>
 </%block>

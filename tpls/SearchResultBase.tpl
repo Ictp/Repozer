@@ -68,6 +68,13 @@
                     </tr>
                     <!-- /Ictp Specific -->
 
+                    <tr>
+                        <td style="text-align: right;">${ _("Use wildcards") }:</td>
+                        <td>
+                            <input type="checkbox" name="wildcards" value="wildcards" ${"checked" if wildcards=="wildcards" else ""} /> (will take longer...)
+                        </td>
+                    </tr>
+
 
                     <tr>
                         <td style="text-align: right;">${ _("Keywords")}:</td>

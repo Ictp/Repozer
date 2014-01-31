@@ -41,8 +41,7 @@ from zope.interface import implements
 
 import MaKaC.services.implementation.conference as conference
 
-# TODO: move to options
-typesToIndicize = ['Conference']
+from indico.ext.search.repozer.options import typesToIndicize
 
 
 # This is just until ROLES will be integrated in Indico with hook on event listener
@@ -58,6 +57,7 @@ if 'ConferenceRolesModification' in defclasses:
             conference.ConferenceRolesModification._handleSet(self)
             rc = RepozeCatalog()
             rc.reindex(self._target)
+            rc.closeConnection()
     conference.methodMap["main.changeRoles"] = ConferenceRolesModificationRepozer
 
 
@@ -72,6 +72,7 @@ class ConferenceKeywordsModificationRepozer( conference.ConferenceKeywordsModifi
         conference.ConferenceKeywordsModification._handleSet(self)
         rc = RepozeCatalog()
         rc.reindex(self._target)
+        rc.closeConnection()        
 conference.methodMap["main.changeKeywords"] = ConferenceKeywordsModificationRepozer        
 
 
@@ -90,28 +91,39 @@ class ObjectChangeListener(Component):
 
     def created(self, obj, owner):
         if self.toIndicize(obj):
-            RepozeCatalog().index(obj)
+            rc = RepozeCatalog()
+            rc.index(obj)
+            rc.closeConnection()
 
     def moved(self, obj, fromOwner, toOwner):
         if self.toIndicize(obj):
-            RepozeCatalog().reindex(obj)
+            rc = RepozeCatalog()
+            rc.reindex(obj)
+            rc.closeConnection()
 
     def deleted(self, obj, oldOwner):
         if self.toIndicize(obj):
-            RepozeCatalog().unindex(obj)
-        
+            rc = RepozeCatalog()
+            rc.unindex(obj)
+            rc.closeConnection()        
+            
     def eventTitleChanged(self, obj, oldTitle, newTitle):
         if self.toIndicize(obj):
-            RepozeCatalog().reindex(obj)    
-
+            rc = RepozeCatalog()
+            rc.reindex(obj)
+            rc.closeConnection()
+            
     def infoChanged(self, obj):
         if self.toIndicize(obj):
-            RepozeCatalog().reindex(obj)
-                
+            rc = RepozeCatalog()
+            rc.reindex(obj)
+            rc.closeConnection()
+                            
     def eventDatesChanged(cls, obj, oldStartDate, oldEndDate, newStartDate, newEndDate):
         if self.toIndicize(obj):
-            RepozeCatalog().reindex(obj)
-                          
+            rc = RepozeCatalog()
+            rc.reindex(obj)
+            rc.closeConnection()                          
 
 class PluginImplementationContributor(Component, Observable):
     """

@@ -26,6 +26,9 @@ from indico.core.config import Config
 from MaKaC.common.output import XSLTransformer
 from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
+from MaKaC.conference import ConferenceHolder
+from MaKaC.webinterface import urlHandlers
+from MaKaC.common.timezoneUtils import DisplayTZ
 
 from xml.dom import minidom
 
@@ -42,23 +45,118 @@ from datetime import datetime
 import time
 from pytz import timezone
 import MaKaC.common.info as info
-import Utils as u
+import Utils as ut
 
 SEA = SEATranslator("repozer")
 
 #plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
 #print "DBinit",plugin.getOptions()["DBinit"].getValue()
 
-class RepozerSearchResult(SearchResult):
+class SearchResultRepozer(object):    
+    
+    #def __init__(self, fid, title, description, startDate):
+    def __init__(self, fid):
+        self._fid = fid
+        self.confId, self.sessionId, self.talkId, self.materialId = self._fid.split("|") 
+        self.ch = ConferenceHolder()
+            
+    def isVisible(self, user):
+        target = self.getTarget()
+        if target:
+            return target.canView(user)
+        else:
+            Logger.get('search').warning("referenced element %s does not exist!" % self.getCompoundId())
+            return False
+            
     @classmethod
-    def create(cls, entryId, title, location, startDate, materials, authors, description):
-        return ConferenceEntryRepozer(entryId, title, location, startDate, materials, authors, description)
+    def create(cls, fid):
+        if ut.getTypeFromFid(fid) == 'Conference':
+            return ConferenceEntryRepozer(fid)
+        if ut.getTypeFromFid(fid) == 'Contribution':
+            return ContributionEntryRepozer(fid)
+        if ut.getTypeFromFid(fid) == 'Material':
+            return MaterialEntryRepozer(fid)
 
-class ConferenceEntryRepozer(ConferenceEntry):
+
+
+class ConferenceEntryRepozer(SearchResultRepozer):
+        
+    def getId(self):
+        return self.confId
+
+    def getTitle(self):
+        return self.getTarget().getTitle()
+
+    def getStartDate(self, aw):
+        tzUtil = DisplayTZ(aw,self.getConference())
+        locTZ = tzUtil.getDisplayTZ()
+        if self.getTarget().getStartDate():
+            return self.getTarget().getStartDate().astimezone(timezone(locTZ))
+        else:
+            return None    
+
+    def getConference(self):
+        try:
+            return self.ch.getById(self.confId)
+        except:
+            return None
+
+    def getDescription(self):
+        return self.getTarget().getDescription()
+    
     def getDescriptionText(self):        
         # this is to avoid partial HTML 
-        return u.getTextFromHtml(self.getDescription())
+        return ut.getTextFromHtml(self.getDescription())
+   
+    def getTarget(self):
+        return self.getConference()
+    
+    def getCompoundId(self):
+        return "%s" % self.getId()
+                
+    def getURL(self):
+        return str(urlHandlers.UHConferenceDisplay.getURL(confId=self.getId()))    
 
+
+class ContributionEntryRepozer(ConferenceEntryRepozer):
+
+    def getId(self):
+        return self.talkId 
+                    
+    def getContribution(self):
+        try:
+            return self.ch.getById(self.confId).getContributionById(self.talkId)
+        except:
+            return None
+            
+    def getTarget(self):
+        return self.getContribution()
+        
+    def getURL(self):
+        return str(urlHandlers.UHContributionDisplay.getURL(confId=self.confId, contribId=self.getId()))
+
+
+class MaterialEntryRepozer(ConferenceEntryRepozer):
+
+    def getId(self):
+        return self.materialId
+
+    def getMaterial(self):
+        try:
+            return self.ch.getById(self.confId).getMaterialById(self.materialId)
+        except:
+            return None
+            
+    def getStartDate(self, aw):
+        return None
+                
+    def getTarget(self):
+        return self.getMaterial()
+        
+    def getURL(self):
+        return self.ch.getById(self.confId).getURL().replace('/indico/e/','/indico/event/') + '/material/' + self.materialId
+        #return str(urlHandlers.UHContributionDisplay.getURL(confId=self.confId, contribId=self.getId()))        
+        
 class RepozerBaseSEA:
     _id = "repozer"
 
@@ -76,13 +174,10 @@ class RepozerBaseSEA:
         else:
             self._sessionHash = 'PUBLIC'
 
-
         self._searchCategories = False
         
         plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
         self._DBpath = plugin.getOptions()["DBpath"].getValue()    
-
-
 
 
     def isSearchTypeOnlyPublic(self):
@@ -134,6 +229,14 @@ class RepozerBaseSEA:
     def translateNumRecords(self, numRecords):
         return numRecords
 
+    @SEA.translate ('collections','text','collections')
+    def translateCollections(self, collections):
+        return collections
+        
+    @SEA.translate ('wildcards','text','wildcards')
+    def translateWildcards(self, wildcards):
+        return wildcards
+        
     @SEA.translate ('sortField',[],'sortField')
     def translateSortField(self, sortField):
         return sortField
@@ -160,42 +263,20 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
     def __init__(self, **params):
         RepozerBaseSEA.__init__(self, **params)
 
-
-
-    def _processElem(self, elementId):
-
-        authors = []
-        materials = []
-        
-        ch = conference.ConferenceHolder()
-        conf = ch.getById(elementId)
-        title = conf.getTitle()
-        location = conf.getLocation()
-        startDate = conf.getStartDate().replace(tzinfo=None)
-        #materials = conf.getMaterialList()        
-        
-        for mat in conf.getAllMaterialList():
-            url = conf.getURL() + '/material/' + mat.getId()
-            materials.append((url, mat.getDescription()))    
-        #print "MAT=",materials
-        description = conf.getDescription()  
-        for contrib in conf.getContributionList():
-            if not isinstance(contrib.getCurrentStatus(),conference.ContribStatusWithdrawn):
-                for auth in contrib.getAuthorList():
-                    authors.append(auth)
-
-        return RepozerSearchResult.create(elementId, title, location, startDate, materials, authors, description)
-
+    def _processElem(self, fid):
+        if fid:
+            return SearchResultRepozer.create(fid)
 
 
     def preProcess(self, results):
         result = []
         for res in results:
-            result.append(self._processElem(res))
+            pp = self._processElem(res)
+            if pp: result.append(pp)
         return result
 
 
-    def _loadBatchOfRecords(self, user, collection, number, start):
+    def _loadBatchOfRecords(self, user, number, start):
 
         record = start
 
@@ -216,19 +297,22 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
 
         while (len(fResults) < number):
 
-            Logger.get("search").debug("asking %s->%s from server (%s)" % (start, numRequest, collection))
+            Logger.get("search").debug("asking %s->%s from server" % (start, numRequest))
 
-            (r, numHits) = self.obtainRecords(startRecord=start,
+            
+            (numHits, r) = self.obtainRecords(startRecord=start,
                                                    numRecords=numRequest,
-                                                   collections=collection,
+                                                   collections=self._filteredParams['collections'],
                                                    startDate = self._filteredParams['startDate'],
                                                    endDate = self._filteredParams['endDate'],
                                                    category = self._filteredParams['category'],
                                                    keywords = self._filteredParams['keywords'],
                                                    p = self._filteredParams['p'],
                                                    f = self._filteredParams['f'],
+                                                   wildcards = self._filteredParams['wildcards'],
                                                    sortField = self._filteredParams['sortField'],
                                                    sortOrder = self._filteredParams['sortOrder'])
+                                                   
             results.extend(r)
 
             # filter
@@ -241,6 +325,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
                 record += 1
             else:
                 allResultsFiltered = len(fResults) > 0
+
 
             if record > numHits or numHits <= number or len(results) <= number or (allResultsFiltered and len(fResults) <= number):
                 shortResult = True
@@ -270,14 +355,14 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         finalArgs = kwargs
 
         Logger.get('search.SEA').debug('Fetching results...')
-        (preResults, numPreResults) = self._fetchResultsFromServer(finalArgs )
+        (numPreResults, preResults) = self._fetchResultsFromServer(finalArgs )
 
         Logger.get('search.SEA').debug('Preprocessing results...')
         results = self.preProcess(preResults)
 
         Logger.get('search').debug('Done!')
 
-        return (results, numPreResults)
+        return (numPreResults, results)
 
     def _fetchResultsFromServer(self, parameters):
 
@@ -285,8 +370,8 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         manager = ConnectionManager()
         catalog = factory(manager)       
         
+        collections = 'Conference'
         title = ''
-        titleWilcard = ''
         searchSMR = False
         startDate = None
         endDate = None
@@ -295,8 +380,8 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         categories = []
         keywords = []
         tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
-        #print "PARAM=",parameters
-
+        #print "PARAM=",parameters        
+                    
         if parameters['p'] != '':
             # Ictp specific:
             if parameters['p'].startswith('smr'):
@@ -304,15 +389,23 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
                 keywords = parameters['p'].replace(' ','')
             else:                  
                 title = parameters['p']
-                ts = title.split(" ")
-                titleWilcard = "*"+"* *".join(ts)+"*"
+                titleManaged = title
+                if parameters['wildcards']:
+                    ts = title.split(" ")
+                    titleManaged = "*"+"* *".join(ts)+"*"
                 #print titleWilcard
+        else:
+            return (0, [])
         if parameters['startDate'] != '':
             sdd,sdm,sdy = parameters['startDate'].split('/')
             startDate = timezone(tz).localize(datetime( int(sdy), int(sdm), int(sdd), 0, 0 ))  
         if parameters['endDate'] != '':
             sdd,sdm,sdy = parameters['endDate'].split('/')
             endDate = timezone(tz).localize(datetime( int(sdy), int(sdm), int(sdd), 0, 0 ))     
+        if parameters['collections'] != '':
+            collections = parameters['collections']
+            if parameters['collections'] == 'All':
+                collections = ''      
         if parameters['sortOrder'] == 'a':
             sortReverse = False
         if parameters['sortField'] != '':
@@ -335,38 +428,38 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         ##### EXECUTE QUERY #####
         
         if parameters['f'] == '':
-            query = Eq('title', titleWilcard)
+            query = Eq('title', titleManaged)
         elif parameters['f'] == 'title_description': 
-            query = Eq('description', titleWilcard) | Eq('title', titleWilcard)
+            query = Eq('description', titleManaged) | Eq('title', titleManaged)
         elif parameters['f'] == 'roles':
             query = Contains('rolesVals', title)                
         if categories != []:
-            query = query & Any('category', categories)        
+            query = query & Any('category', categories) 
+        if collections != '':
+            query = query & Any('collection', collections)        
         if keywords != []:
             query = query & Any('keywords', keywords)
-                            
-        query = query & InRange('startDate',startDate, endDate)  
+
+        if startDate:                    
+            query = query & InRange('startDate',startDate, endDate)  
         # Ictp specific:
         if searchSMR:
             query = Any('keywords', keywords)
           
-        numdocs, results = catalog.query(query, sort_index=sortField, reverse=sortReverse, limit=self._pagination)
-
-        # Ictp specific: have to replace 9999 with 'a' 
-        res = []
-        for r in results:
-            if str(r).startswith('9999'): res.append(str(r).replace('9999','a'))
-            else: res.append(str(r))                
+    
         
+        numdocs, results = catalog.query(query, sort_index=sortField, reverse=sortReverse, limit=self._pagination)        
+        # Convert doc_ids to fid
+        results = [catalog.document_map.address_for_docid(result) for result in results]          
+        #print "RES=",results
         factory.db.close()
         
-        return (res, numdocs)
+        return (numdocs, results)
 
 
-    def _getResults(self, collection, number):
+    def _getResults(self, number):
 
         params = copy.copy(self._filteredParams)
-        params['collections'] = collection
         params['target'] = self._target.getId()
 
         queryHash = self._getQueryHash(params)
@@ -380,7 +473,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         # get the access wrapper, so we can check user access privileges
         user = ContextManager.get("currentRH", None).getAW()
 
-        results, numHits, shortResult, record = self._loadBatchOfRecords(user, collection, number, start)
+        results, numHits, shortResult, record = self._loadBatchOfRecords(user, number, start)
 
         self._cacheNextStartingRecord(queryHash, self._page, record, cachedObj)
 
@@ -395,21 +488,12 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
 
         params = copy.copy(self._filteredParams)
         
-        # right now, I want to search ONLY in Events, so I force it
-        params['collections'] = 'Events'
-
         nEvtRec, nContRec = 0, 0
         numEvtHits, numContHits = 0, 0
         eventResults, contribResults = [], []
         
-        if not self._noQuery:
-            if params.get('collections',"") != 'Contributions':
-                numEvtHits, evtShortResult, nEvtRec, eventResults = self._getResults('Events', self._pagination)
-                params['evtShortResult'] = evtShortResult
-
-            if params.get('collections',"") != 'Events':
-                numContHits, contShortResult, nContRec, contribResults = self._getResults('Contributions', self._pagination)
-                params['contShortResult'] = contShortResult
+        numEvtHits, evtShortResult, nEvtRec, eventResults = self._getResults(self._pagination)
+        params['evtShortResult'] = evtShortResult
 
         params['p'] = cgi.escape(phrase, quote=True)
         params['f'] = cgi.escape(filteredParams.get('f', ''), quote=True)

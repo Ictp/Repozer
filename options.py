@@ -30,3 +30,7 @@ globalOptions = [
                   "editable": True,
                   "visible": True}),
 ]
+
+# MATERIAL not yet available
+#typesToIndicize = ['Conference','Contribution','Material']
+typesToIndicize = ['Conference','Contribution']

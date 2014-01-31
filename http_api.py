@@ -83,9 +83,7 @@ class SearchFetcher(IteratedDataFetcher):
         if params._today:
             td = params._today.split('/')
             today_ts = timezone(localTimezone).localize(datetime(int(td[0]), int(td[1]), int(td[2]), 0, 0))
-            query = Le('startDate',today_ts) & Ge('endDate',today_ts)
-            
-            
+            query = Le('startDate',today_ts) & Ge('endDate',today_ts)            
         
         if params._keywords:
             kw = params._keywords.split(',')
@@ -95,18 +93,22 @@ class SearchFetcher(IteratedDataFetcher):
             kw = params._category.split(',')
             query = query & Any('category', kw)
         
+        # Just return Conference objs
+        query = query & Eq('collection', 'Conference')
+                
         numdocs, results = catalog.query(query)
+        results = [catalog.document_map.address_for_docid(result) for result in results]     
         
         res = []
-        ch = ConferenceHolder()
-        
+        ch = ConferenceHolder()        
         for obj in results:
-            confId = str(obj)
-            if obj > 99990: # this is only for ICTP migrated conferences
-                confId = 'a'+str(obj)[4:]    
-            event = ch.getById(confId)
-            res.append(event)
+            try:
+                confId = str(obj).split("|")[0]
+                event = ch.getById(confId)
+                res.append(event)
+            except:
+                pass
         return self._process(res)
-    
+        
     
     
