@@ -30,8 +30,7 @@
                     </select>
                 </td>
             </tr>
-            
-            
+                        
             <!-- Ictp Specific: Hard coded Category fields. Can be removed or replaced with full text input box -->
             <tr>
                 <td style="text-align: right;">${ _("Category")}</td>

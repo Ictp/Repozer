@@ -19,17 +19,17 @@
 from MaKaC.i18n import _
 
 from indico.core.config import Config
-#currentPath = Config.getInstance().getConfigurationDir()  # DEPRECATED... :(
 
 
-
-globalOptions = [
-    ("DBpath", {"description": "Repozer DB path",
-                  "type": str,
-                  "defaultValue": "/opt/indico/db/indico_catalog.fs",
-                  "editable": True,
-                  "visible": True}),
-]
+# This is for external DB
+#globalOptions = [
+#    ("DBpath", {"description": "Repozer DB path",
+#                  "type": str,
+#                  "defaultValue": "/opt/indico/db/repoze_catalog.fs",
+#                  "editable": True,
+#                  "visible": True}),
+#]
+globalOptions = []
 
 # MATERIAL not yet available
 #typesToIndicize = ['Conference','Contribution','Material']

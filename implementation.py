@@ -36,8 +36,9 @@ from urllib import urlencode
 import urllib2
 
 from MaKaC.plugins.base import PluginsHolder
-from repoze.catalog.catalog import FileStorageCatalogFactory
-from repoze.catalog.catalog import ConnectionManager
+#from repoze.catalog.catalog import FileStorageCatalogFactory
+#from repoze.catalog.catalog import ConnectionManager
+from indico.ext.search.repozer.repozeIndexer import RepozeCatalog
 from repoze.catalog.query import *
 
 
@@ -366,9 +367,11 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
 
     def _fetchResultsFromServer(self, parameters):
 
-        factory = FileStorageCatalogFactory(self._DBpath,'indico_catalog')
-        manager = ConnectionManager()
-        catalog = factory(manager)       
+        #factory = FileStorageCatalogFactory(self._DBpath,'repoze_catalog')
+        #manager = ConnectionManager()
+        #catalog = factory(manager)       
+        rc = RepozeCatalog()
+        catalog = rc.catalog
         
         collections = 'Conference'
         title = ''
@@ -452,7 +455,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         # Convert doc_ids to fid
         results = [catalog.document_map.address_for_docid(result) for result in results]          
         #print "RES=",results
-        factory.db.close()
+        #factory.db.close()
         
         return (numdocs, results)
 

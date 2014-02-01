@@ -4,8 +4,11 @@
 ## This file is added for Indexing Indico's contents with repoze.catalog
 ## Copyright (C) 2013 Ictp.
 
-from repoze.catalog.catalog import FileStorageCatalogFactory
-from repoze.catalog.catalog import ConnectionManager
+#from repoze.catalog.catalog import FileStorageCatalogFactory
+#from repoze.catalog.catalog import ConnectionManager
+try: from indico.core import db
+except: from MaKaC.common import db
+
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.conference import ConferenceHolder
 import MaKaC.common.info as info
@@ -15,18 +18,48 @@ import transaction
 import Utils as ut
 import pyPdf
 
+from repoze.catalog.catalog import Catalog as RCatalog
+from repoze.catalog.indexes.field import CatalogFieldIndex
+from repoze.catalog.indexes.text import CatalogTextIndex
+from repoze.catalog.indexes.keyword import CatalogKeywordIndex
+from repoze.catalog.document import DocumentMap
 from indico.ext.search.repozer.options import typesToIndicize
 
 class RepozeCatalog():
 
     def __init__(self):
-        self.catalog = {}
-        self.factory = None
-        self.manager = None
-        self.openConnection()
+        dbc = db.DBMgr.getInstance().getDBConnection()
+        self.root = dbc.root()
+        if 'repozecatalog' not in self.root:
+            init_catalog()
+        self.catalog = self.root['repozecatalog']
         pass
     
-    
+    def init_catalog():
+        '''
+        Create a repoze.catalog instance and specify
+        indices of intereset
+        '''
+        self.root['repozecatalog'] = RCatalog()
+        catalog = dbroot['repozecatalog']
+        catalog.document_map = DocumentMap()                
+        # set up indexes
+        catalog['title'] = CatalogTextIndex('_get_title')
+        catalog['titleSorter'] = CatalogFieldIndex('_get_sorter')
+        catalog['collection'] = CatalogKeywordIndex('_get_collection')
+        # Descriptions are converted to TEXT for indexing
+        catalog['description'] = CatalogTextIndex('_get_description')
+        catalog['startDate'] = CatalogFieldIndex('_get_startDate')
+        catalog['endDate'] = CatalogFieldIndex('_get_endDate')
+        catalog['keywords'] = CatalogKeywordIndex('_get_keywordsList')
+        catalog['category'] = CatalogKeywordIndex('_catName')
+        # I define as Text because I would permit searched for part of names
+        catalog['rolesVals'] = CatalogTextIndex('_get_roles')
+        catalog['person'] = CatalogTextIndex('_get_person')        
+        # commit the indexes
+        transaction.commit()
+
+        
     def indicizeConference(self, obj, catalog=None):
         if not catalog: catalog = self.catalog
         fid = ut.getFid(obj)
@@ -103,11 +136,8 @@ class RepozeCatalog():
         nd = timezone(localTimezone).localize(datetime(1970,1,1, 0, 0)) # Set 1900/1/1 as None
         obj._get_startDate = nd
         obj._get_endDate = nd       
-        print "FID=",fid,"_____DESCR=",obj._get_description[:100]      
         catalog.index_doc(doc_id, obj)    
-                
-                
-                
+                                
                 
     def index(self, conf):   
         if 'Conference' in typesToIndicize:
@@ -140,6 +170,7 @@ class RepozeCatalog():
                         mat._content = content
                         print "indexing material:",fpath    
                         self.indicizeMaterial(mat)
+        transaction.commit() 
 
     def _unindexFid(self, fid):
         try:
@@ -150,7 +181,6 @@ class RepozeCatalog():
 
         
     def unindex(self, conf):    
-        print "UNINDEX"
         if 'Material' in typesToIndicize:
             for mat in conf.getAllMaterialList():
                 for obj in mat.getResourceList():
@@ -160,12 +190,12 @@ class RepozeCatalog():
                 self._unindexFid(ut.getFid(obj))
         if 'Conference' in typesToIndicize:
             self._unindexFid(ut.getFid(conf))
+        transaction.commit() 
 
         
     def reindex(self, c):
         fid = ut.getFid(c)
         confId, sessionId, talkId, materialId = fid.split("|")
-        print "REINDEX",fid
         # Check if conference still exist
         ch = ConferenceHolder()        
         cc = None
@@ -178,14 +208,16 @@ class RepozeCatalog():
 
         
     def closeConnection(self):
-        transaction.commit()              
-        self.factory.db.close()
-        self.manager.commit()        
-        self.manager.close() 
+        #transaction.commit()              
+        #self.factory.db.close()
+        #self.manager.commit()        
+        #self.manager.close() 
+        pass
 
     def openConnection(self):
-        plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
-        DBpath = plugin.getOptions()["DBpath"].getValue()
-        self.factory = FileStorageCatalogFactory(DBpath,'indico_catalog')
-        self.manager = ConnectionManager()
-        self.catalog = self.factory(self.manager)
+        #plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
+        #DBpath = plugin.getOptions()["DBpath"].getValue()
+        #self.factory = FileStorageCatalogFactory(DBpath,'repoze_catalog')
+        #self.manager = ConnectionManager()
+        #self.catalog = self.factory(self.manager)
+        pass

@@ -63,16 +63,15 @@ Otherwise, you will have to change your source files in
 
 - Start Indico    
 - Enter Admin web interface, Plugins
-- Enable Search plugin, Repozer, set default Sea = Repozer
-- Set Repozer DB path (***CHECK IT!!!***) and Save Settings
+- Enable Search plugin, Repozer, set default Sea = Repozer and Save Settings
 - Via shell, go to "<Indico path>/src/indico/ext/search/repozer/manage" and type:
 
 ```
     $ python createRepozeCatalog.py
 ```
 
-this will create the inidico_catalog.fs (you should see percentage numbers)
-- chown (apache:apache or whatever) the indico_catalog.fs and related files
+this will create the repozecatalog inside your Data.fs (you should see percentage numbers)
+- It could take a long time. At the end it will pack your DB.
 
 
 **Now your search engine is up-n-running!**
@@ -86,7 +85,7 @@ BEWARE!
 There are some things that you should notice:
 - Results pagination has been disabled and results are limited to 5000 
     (you can change this behaviour by yourself by looking into code)
-- Search is inside Events, not Contributions (right now, to make it faster... in the future we will let you choose)
+- Search is inside Events, and Contributions, not Materials (will come asap...)
 - You can add/edit indexing by editing repozeIndexer.py and createRepozeCatalog.py
 
 
@@ -94,7 +93,6 @@ There are some things that you should notice:
 
 Because of Repozer has been developed by Ictp, there are few customization you should change 
 according to your company needs. Take a look inside files of Repozer package: 
-- implementation.py : lines 328 and 355
 - tpls/SearchBoxBase.tpl : line 34
 - tpls/SearchResultBase.tpl : line 55
 
@@ -113,7 +111,7 @@ To understand it better, just take a look at http_api.py
 E.g. you can make a call like this:
 
 ```
-http://<Indico URL>/indico/export/conference/search.xml?start_date=2013/01/01&keywords=Analysis,Physics
+http://<Indico URL>/indico/export/conference/search.xml?start_date=2013/01/01&keywords=Condensed Matter and Statistical Physics,Computational Physics in Condensed Matter
 ```
 
 Usable Parameters are:
