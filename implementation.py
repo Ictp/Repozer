@@ -177,8 +177,8 @@ class RepozerBaseSEA:
 
         self._searchCategories = False
         
-        plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
-        self._DBpath = plugin.getOptions()["DBpath"].getValue()    
+        #plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
+        #self._DBpath = plugin.getOptions()["DBpath"].getValue()    
 
 
     def isSearchTypeOnlyPublic(self):
