@@ -35,13 +35,12 @@ class RepozeCatalog():
         self.catalog = self.root['repozecatalog']
         pass
     
-    def init_catalog():
+    def init_catalog(self):
         '''
         Create a repoze.catalog instance and specify
         indices of intereset
-        '''
-        self.root['repozecatalog'] = RCatalog()
-        catalog = dbroot['repozecatalog']
+        '''        
+        catalog = RCatalog()
         catalog.document_map = DocumentMap()                
         # set up indexes
         catalog['title'] = CatalogTextIndex('_get_title')
@@ -57,6 +56,7 @@ class RepozeCatalog():
         catalog['rolesVals'] = CatalogTextIndex('_get_roles')
         catalog['person'] = CatalogTextIndex('_get_person')        
         # commit the indexes
+        self.root['repozecatalog'] = catalog
         transaction.commit()
 
         
