@@ -27,28 +27,13 @@ from indico.ext.search.repozer.options import typesToIndicize
 from indico.ext.search.repozer.repozeIndexer import RepozeCatalog
 from repoze.catalog.query import *
 import transaction
-# This is for using with external DB
-#from repoze.catalog.catalog import FileStorageCatalogFactory
-#from repoze.catalog.catalog import ConnectionManager
-#from persistent import Persistent
-#from BTrees.OOBTree import OOBTree
 
 
 db.DBMgr.getInstance().startRequest()
-
-# This is for using with external DB
-#plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
-#DBpath = plugin.getOptions()["DBpath"].getValue() 
-#factory = FileStorageCatalogFactory(DBpath, 'repoze_catalog')
-
 rc = RepozeCatalog()
 
-
 def buildCatalog():
-    # Force indexes creation
-    rc.init_catalog()
-    #manager = ConnectionManager()
-    #catalog = factory(manager)
+    rc.init_catalog() # Forces index rebuild
     cm = CategoryManager()
     totnum = len(cm.getList())
     curnum = 0
@@ -66,9 +51,10 @@ def buildCatalog():
                 pass
             if (c != None):                
                 c._catName = [str(cat.name)]                
-                rc.index(c)                
+                rc.index(c) 
+                transaction.commit()               
         
-        transaction.commit()
+        
 
         curnum += 1
         per = int(float(curnum)/float(totnum)*100)
@@ -76,23 +62,14 @@ def buildCatalog():
             curper = per
             print "%s%%" % per
             
-    #rc.closeConnection()
     # Pack it when finished
     print "Packing...."
-    #rc.factory.db.pack()
     db.DBMgr.getInstance().pack()
-    #rc.closeConnection()
-    
     print "Done."
     
-    db.DBMgr.getInstance().endRequest()
-
+    
 
 if __name__ == '__main__':     
-    buildCatalog()
-    # QUERY TEST
-    #query = Eq('title', 'Ictp') & Any('collection', ['Conference'])
-    #numdocs, results = rc.catalog.query(query)
-    #rc.closeConnection()
-    #print "QUERY RES=",numdocs,results
+    buildCatalog()    
+    db.DBMgr.getInstance().endRequest()
     

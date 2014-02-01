@@ -28,20 +28,19 @@ from indico.ext.search.repozer.options import typesToIndicize
 class RepozeCatalog():
 
     def __init__(self):
-        dbc = db.DBMgr.getInstance().getDBConnection()
-        self.root = dbc.root()
-        if 'repozecatalog' not in self.root:
-            init_catalog()
-        self.catalog = self.root['repozecatalog']
-        pass
+        self.catalog = {}
+        self.db = db.DBMgr.getInstance().getDBConnection()
+        if 'repozecatalog' not in self.db.root():
+            self.init_catalog()
+        self.catalog = self.db.root()['repozecatalog']
+
     
-    def init_catalog():
+    def init_catalog(self):
         '''
         Create a repoze.catalog instance and specify
         indices of intereset
-        '''
-        self.root['repozecatalog'] = RCatalog()
-        catalog = dbroot['repozecatalog']
+        '''        
+        catalog = RCatalog()
         catalog.document_map = DocumentMap()                
         # set up indexes
         catalog['title'] = CatalogTextIndex('_get_title')
@@ -55,7 +54,9 @@ class RepozeCatalog():
         catalog['category'] = CatalogKeywordIndex('_catName')
         # I define as Text because I would permit searched for part of names
         catalog['rolesVals'] = CatalogTextIndex('_get_roles')
-        catalog['person'] = CatalogTextIndex('_get_person')        
+        catalog['person'] = CatalogTextIndex('_get_person')
+        self.db.root()['repozecatalog'] = catalog
+        self.catalog = self.db.root()['repozecatalog'] 
         # commit the indexes
         transaction.commit()
 
