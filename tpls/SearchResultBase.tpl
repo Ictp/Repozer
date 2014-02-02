@@ -52,7 +52,6 @@
                         </td>
                       </tr>
                                             
-                    <!-- Ictp Specific: Hard coded Category fields. Can be removed or replaced with full text input box -->
                     <tr>
                         <td style="text-align: right;">${ _("Category")}:</td>
                         <td>
@@ -61,13 +60,9 @@
                                 % for cat in catnames:
                                     <option value="${cat}" ${"selected" if category==cat else ""}>${cat}</option>
                                 % endfor
-                                
-                                
-
                             </select>
                         </td>
                     </tr>
-                    <!-- /Ictp Specific -->
 
                     <tr>
                         <td style="text-align: right;">${ _("Use wildcards") }:</td>
