@@ -420,13 +420,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         # Ictp specific: just replace with your custom dictionary or
         # with: categories = parameters['category'].split(',')      
         if parameters['category'] != '':
-            dict_cat = {'Activities in Trieste':'ICTP activities in Trieste',
-                'Activities outside Trieste':'ICTP activities outside Trieste',
-                'Seminars':'Hosted activities',
-                'Hosted activities':'Hosted activities'}
-            for cat in parameters['category'].split(','):
-                categories.append(dict_cat[cat])
-            
+            category = parameters['category']        
             
         ##### EXECUTE QUERY #####
         
@@ -436,8 +430,8 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
             query = Eq('description', titleManaged) | Eq('title', titleManaged)
         elif parameters['f'] == 'roles':
             query = Contains('rolesVals', title)                
-        if categories != []:
-            query = query & Any('category', categories) 
+        if category != []:
+            query = query & Any('category', category) 
         if collections != '':
             query = query & Any('collection', collections)        
         if keywords != []:
@@ -503,7 +497,14 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
 
         params['eventResults'] = eventResults
         params['contribResults'] = contribResults
-        
+                
+        catnames = []
+        for cat in conference.CategoryManager().getList():
+            catparent = cat.getOwner()
+            if catparent and catparent.getCategory().getId() == '0':
+                catnames.append(cat.name)
+
+        params['catnames'] = catnames
 
         params['nEventResult'] = nEvtRec
         params['nContribResult'] = nContRec

@@ -58,10 +58,12 @@
                         <td>
                             <select name="category">                  
                                 <option value="" ${"selected" if category=="" else ""}>${ _("All")}</option>
-                                <option value="Activities in Trieste" ${"selected" if category=="Activities in Trieste" else ""}>${ _("Activities in Trieste")}</option>
-                                <option value="Activities outside Trieste" ${"selected" if category=="Activities outside Trieste" else ""}>${ _("Activities outside Trieste")}</option>
-                                <option value="Seminars" ${"selected" if category=="Seminars" else ""}>${ _("Seminars")}</option>
-                                <option value="Hosted activities" ${"selected" if category=="Hosted activities" else ""}>${ _("Hosted activities")}</option>
+                                % for cat in catnames:
+                                    <option value="${cat}" ${"selected" if category==cat else ""}>${cat}</option>
+                                % endfor
+                                
+                                
+
                             </select>
                         </td>
                     </tr>
