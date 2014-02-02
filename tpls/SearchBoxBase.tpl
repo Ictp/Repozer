@@ -2,6 +2,7 @@
 <input type="hidden" id="searchCategId" name="categId" value="0" data-current="${targetId}" data-current-name="${categName}"/>
 <input type="hidden" name="sortOrder" value="d"/>
 <input type="hidden" name="collections" value=""/>
+<input type="hidden" name="category" value=""/>
 <div id="UISearchBox">
     <div id="searchControls">
         <div class="searchButton">
@@ -30,19 +31,6 @@
                     </select>
                 </td>
             </tr>
-                        
-            <tr>
-                        <td style="text-align: right;">${ _("Category")}:</td>
-                        <td>
-                            <select name="category">                  
-                                <option value="" ${"selected" if category=="" else ""}>${ _("All")}</option>
-                                % for cat in catnames:
-                                    <option value="${cat}" ${"selected" if category==cat else ""}>${cat}</option>
-                                % endfor
-                            </select>
-                        </td>
-                    </tr>
-
 
             <tr>
                 <td style="text-align: right;">${ _("Start Date")}</td>

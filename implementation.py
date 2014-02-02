@@ -380,7 +380,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         endDate = None
         sortField = 'startDate'
         sortReverse = True
-        categories = []
+        category = ''
         keywords = []
         tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
         #print "PARAM=",parameters        
@@ -428,7 +428,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
             query = Eq('description', titleManaged) | Eq('title', titleManaged)
         elif parameters['f'] == 'roles':
             query = Contains('rolesVals', title)                
-        if category != []:
+        if category != '':
             query = query & Any('category', category) 
         if collections != '':
             query = query & Any('collection', collections)        
