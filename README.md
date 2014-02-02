@@ -85,21 +85,8 @@ BEWARE!
 There are some things that you should notice:
 - Results pagination has been disabled and results are limited to 5000 
     (you can change this behaviour by yourself by looking into code)
-- Search is inside Events, and Contributions, not Materials (will come asap...)
+- Search is inside Events, and Contributions, not Materials
 - You can add/edit indexing by editing repozeIndexer.py and createRepozeCatalog.py
-
-
-### SPECIFIC CUSTOMIZATION:
-
-Because of Repozer has been developed by Ictp, there are few customization you should change 
-according to your company needs. Take a look inside files of Repozer package: 
-- tpls/SearchBoxBase.tpl : line 34
-- tpls/SearchResultBase.tpl : line 55
-
-
-
-
-
 
 
 HTTP_API.PY
