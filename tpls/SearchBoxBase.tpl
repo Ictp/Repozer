@@ -31,22 +31,17 @@
                 </td>
             </tr>
                         
-            <!-- Ictp Specific: Hard coded Category fields. Can be removed or replaced with full text input box -->
             <tr>
-                <td style="text-align: right;">${ _("Category")}</td>
-                <td>
-                 
-                    <select name="category">                  
-                        <option value="" ${"selected" if category=="" else ""}>${ _("All")}</option>
-                        <option value="Activities in Trieste" ${"selected" if category=="Activities in Trieste" else ""}>${ _("Activities in Trieste")}</option>
-                        <option value="Activities outside Trieste" ${"selected" if category=="Activities outside Trieste" else ""}>${ _("Activities outside Trieste")}</option>
-                        <option value="Seminars" ${"selected" if category=="Seminars" else ""}>${ _("Seminars")}</option>
-                        <option value="Hosted activities" ${"selected" if category=="Hosted activities" else ""}>${ _("Hosted activities")}</option>
-                    </select>                                             
-
-                </td>
-            </tr>
-            <!-- /Ictp Specific -->
+                        <td style="text-align: right;">${ _("Category")}:</td>
+                        <td>
+                            <select name="category">                  
+                                <option value="" ${"selected" if category=="" else ""}>${ _("All")}</option>
+                                % for cat in catnames:
+                                    <option value="${cat}" ${"selected" if category==cat else ""}>${cat}</option>
+                                % endfor
+                            </select>
+                        </td>
+                    </tr>
 
 
             <tr>

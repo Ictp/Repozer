@@ -417,8 +417,6 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
             keywords = parameters['keywords'].split(',')     
 
         
-        # Ictp specific: just replace with your custom dictionary or
-        # with: categories = parameters['category'].split(',')      
         if parameters['category'] != '':
             category = parameters['category']        
             
