@@ -76,7 +76,7 @@ class SearchFetcher(IteratedDataFetcher):
 
         if params._today:
             td = params._today.split('/')
-            today_ts = timezone(localTimezone).localize(datetime(int(td[0]), int(td[1]), int(td[2]), 0, 0))
+            today_ts = timezone(localTimezone).localize(datetime(int(td[0]), int(td[1]), int(td[2]), 23, 59))
             query = Le('startDate',today_ts) & Ge('endDate',today_ts)            
         
         if params._keywords:
