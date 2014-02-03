@@ -36,8 +36,6 @@ from urllib import urlencode
 import urllib2
 
 from MaKaC.plugins.base import PluginsHolder
-#from repoze.catalog.catalog import FileStorageCatalogFactory
-#from repoze.catalog.catalog import ConnectionManager
 from indico.ext.search.repozer.repozeIndexer import RepozeCatalog
 from repoze.catalog.query import *
 
@@ -49,9 +47,6 @@ import MaKaC.common.info as info
 import Utils as ut
 
 SEA = SEATranslator("repozer")
-
-#plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
-#print "DBinit",plugin.getOptions()["DBinit"].getValue()
 
 class SearchResultRepozer(object):    
     
@@ -177,8 +172,6 @@ class RepozerBaseSEA:
 
         self._searchCategories = False
         
-        #plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
-        #self._DBpath = plugin.getOptions()["DBpath"].getValue()    
 
 
     def isSearchTypeOnlyPublic(self):
@@ -367,9 +360,6 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
 
     def _fetchResultsFromServer(self, parameters):
 
-        #factory = FileStorageCatalogFactory(self._DBpath,'repoze_catalog')
-        #manager = ConnectionManager()
-        #catalog = factory(manager)       
         rc = RepozeCatalog()
         catalog = rc.catalog
         
@@ -415,10 +405,8 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
             sortField = parameters['sortField']
         if parameters['keywords'] != '':
             keywords = parameters['keywords'].split(',')     
-
-        
         if parameters['category'] != '':
-            category = parameters['category']        
+            category = parameters['category'] 
             
         ##### EXECUTE QUERY #####
         
@@ -427,7 +415,11 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         elif parameters['f'] == 'title_description': 
             query = Eq('description', titleManaged) | Eq('title', titleManaged)
         elif parameters['f'] == 'roles':
-            query = Contains('rolesVals', title)                
+            query = Contains('rolesVals', title)   
+        elif parameters['f'] == 'persons':
+            query = Contains('persons', title)  
+        elif parameters['f'] == 'all':
+            query = Eq('description', titleManaged) | Eq('title', titleManaged) | Contains('persons', title) | Contains('rolesVals', title)
         if category != '':
             query = query & Contains('category', category) 
         if collections != '':
@@ -445,10 +437,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         
         numdocs, results = catalog.query(query, sort_index=sortField, reverse=sortReverse, limit=self._pagination)        
         # Convert doc_ids to fid
-        results = [catalog.document_map.address_for_docid(result) for result in results]          
-        #print "RES=",results
-        #factory.db.close()
-        
+        results = [catalog.document_map.address_for_docid(result) for result in results]                  
         return (numdocs, results)
 
 

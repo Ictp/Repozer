@@ -85,6 +85,21 @@ def getCatFid(obj):
     return catList
     
 
+def getTextFromAvatar(alist):
+    data = []
+    for s in alist:
+        t = type(s).__name__
+        if t in ['ContributionParticipation','ConferenceChair']:            
+            name = s.getFullNameNoTitle() + ' ' + s.getAffiliation()
+        else:
+            name = s.getValues()['familyName']
+            if hasattr(s.getValues(), 'firstName'): name += ' ' + s.getValues()['firstName']
+            if hasattr(s.getValues(), 'affiliation'): name += ' ' + s.getValues()['affiliation']
+        data.append(name)
+    if data: return str(' '.join(data))
+    return '' 
+
+
 def getTypeFromFid(fid):
     confId, sessionId, talkId, materialId = fid.split("|")
     if materialId: return 'Material'

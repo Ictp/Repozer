@@ -54,7 +54,7 @@ class RepozeCatalog():
         catalog['category'] = CatalogKeywordIndex('_get_categoryList')
         # I define as Text because I would permit searched for part of names
         catalog['rolesVals'] = CatalogTextIndex('_get_roles')
-        catalog['person'] = CatalogTextIndex('_get_person')
+        catalog['persons'] = CatalogTextIndex('_get_persons')
         self.db.root()['repozecatalog'] = catalog
         self.catalog = self.db.root()['repozecatalog'] 
         # commit the indexes
@@ -75,7 +75,10 @@ class RepozeCatalog():
         if hasattr(obj, '_keywords') and len(obj._keywords)>0: 
              obj._get_keywordsList = obj.getKeywords().split('\n')
         obj._get_roles = ut.getRolesValues(obj)    
-        obj._get_person = ''
+
+        obj._get_persons = ''
+        if obj.getChairList(): 
+            obj._get_persons = ut.getTextFromAvatar(obj.getChairList())
         obj._get_title = obj.getTitle()
         obj._get_startDate = obj.getStartDate()
         obj._get_endDate = obj.getEndDate()        
@@ -102,15 +105,10 @@ class RepozeCatalog():
         obj._get_keywordsList = []     
         if hasattr(obj, '_keywords') and len(obj._keywords)>0: 
              obj._get_keywordsList = obj.getKeywords().split('\n')
-        obj._get_roles = ut.getRolesValues(obj)    
-        data = []
-        for s in obj.getSpeakerList():
-            name = s.getValues()['familyName']
-            if hasattr(s.getValues(), 'firstName'): name += ' ' + s.getValues()['firstName']
-            if hasattr(s.getValues(), 'affiliation'): name += ' ' + s.getValues()['affiliation']
-            data.append(name)
-        if data: obj._get_person = str(' '.join(data))
-        else: obj._get_person = ''               
+        obj._get_roles = ut.getRolesValues(obj) 
+        obj._get_persons = ''
+        if obj.getSpeakerList(): 
+            obj._get_persons = ut.getTextFromAvatar(obj.getSpeakerList())   
         obj._get_title = obj.getTitle()
         obj._get_startDate = obj.getStartDate()
         obj._get_endDate = obj.getEndDate()
