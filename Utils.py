@@ -71,6 +71,20 @@ def getFid(obj):
     return fid
 
 
+def getCatFid(obj):  
+    catList = []
+    catowner = obj.getOwner()
+    catId = obj.getOwner().getId()
+    catList.append(catId)
+    catowner = catowner.getOwner()
+    while catowner:
+        catId += "|"+catowner.getId()
+        if catowner.name != 'Home':
+            catList.append(catId)
+        catowner = catowner.getOwner()
+    return catList
+    
+
 def getTypeFromFid(fid):
     confId, sessionId, talkId, materialId = fid.split("|")
     if materialId: return 'Material'

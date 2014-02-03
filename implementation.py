@@ -429,7 +429,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         elif parameters['f'] == 'roles':
             query = Contains('rolesVals', title)                
         if category != '':
-            query = query & Any('category', category) 
+            query = query & Contains('category', category) 
         if collections != '':
             query = query & Any('collection', collections)        
         if keywords != []:
@@ -496,13 +496,13 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         params['eventResults'] = eventResults
         params['contribResults'] = contribResults
                 
-        catnames = []
+        categories = {}
         for cat in conference.CategoryManager().getList():
             catparent = cat.getOwner()
             if catparent and catparent.getCategory().getId() == '0':
-                catnames.append(cat.name)
+                categories[cat.getId()] = cat.name
 
-        params['catnames'] = catnames
+        params['categories'] = categories
 
         params['nEventResult'] = nEvtRec
         params['nContribResult'] = nContRec
