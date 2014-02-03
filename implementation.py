@@ -421,7 +421,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         elif parameters['f'] == 'all':
             query = Eq('description', titleManaged) | Eq('title', titleManaged) | Contains('persons', title) | Contains('rolesVals', title)
         if category != '':
-            query = query & Contains('category', category) 
+            query = query & Any('category', category) 
         if collections != '':
             query = query & Any('collection', collections)        
         if keywords != []:
