@@ -139,7 +139,11 @@ class RepozeCatalog():
         catalog.index_doc(doc_id, obj)    
                                 
                 
-    def index(self, conf):   
+    def index(self, obj):   
+        fid = ut.getFid(obj)
+        confId, sessionId, talkId, materialId = fid.split("|")
+        ch = ConferenceHolder()        
+        conf = ch.getById(confId)
         if 'Conference' in typesToIndex:
             self.indexConference(conf)
 
@@ -178,7 +182,11 @@ class RepozeCatalog():
             pass
 
         
-    def unindex(self, conf):    
+    def unindex(self, obj):  
+        fid = ut.getFid(obj)
+        confId, sessionId, talkId, materialId = fid.split("|")
+        ch = ConferenceHolder()        
+        conf = ch.getById(confId)  
         if 'Material' in typesToIndex:
             for mat in conf.getAllMaterialList():
                 for obj in mat.getResourceList():

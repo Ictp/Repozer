@@ -86,41 +86,41 @@ class ObjectChangeListener(Component):
 
     implements(IMetadataChangeListener, IObjectLifeCycleListener)
 
-    def toIndicize(self,obj):
+    def toIndex(self,obj):
         return type(obj).__name__ in typesToIndex
 
     def created(self, obj, owner):
-        if self.toIndicize(obj):
+        if self.toIndex(obj):
             rc = RepozeCatalog()
             rc.index(obj)
             rc.closeConnection()
 
     def moved(self, obj, fromOwner, toOwner):
-        if self.toIndicize(obj):
+        if self.toIndex(obj):
             rc = RepozeCatalog()
             rc.reindex(obj)
             rc.closeConnection()
 
     def deleted(self, obj, oldOwner):
-        if self.toIndicize(obj):
+        if self.toIndex(obj):
             rc = RepozeCatalog()
             rc.unindex(obj)
             rc.closeConnection()        
             
     def eventTitleChanged(self, obj, oldTitle, newTitle):
-        if self.toIndicize(obj):
+        if self.toIndex(obj):
             rc = RepozeCatalog()
             rc.reindex(obj)
             rc.closeConnection()
             
     def infoChanged(self, obj):
-        if self.toIndicize(obj):
+        if self.toIndex(obj):
             rc = RepozeCatalog()
             rc.reindex(obj)
             rc.closeConnection()
                             
     def eventDatesChanged(cls, obj, oldStartDate, oldEndDate, newStartDate, newEndDate):
-        if self.toIndicize(obj):
+        if self.toIndex(obj):
             rc = RepozeCatalog()
             rc.reindex(obj)
             rc.closeConnection()                          
