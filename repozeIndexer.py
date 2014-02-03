@@ -23,7 +23,7 @@ from repoze.catalog.indexes.field import CatalogFieldIndex
 from repoze.catalog.indexes.text import CatalogTextIndex
 from repoze.catalog.indexes.keyword import CatalogKeywordIndex
 from repoze.catalog.document import DocumentMap
-from indico.ext.search.repozer.options import typesToIndicize
+from indico.ext.search.repozer.options import typesToIndex
 
 class RepozeCatalog():
 
@@ -51,7 +51,7 @@ class RepozeCatalog():
         catalog['startDate'] = CatalogFieldIndex('_get_startDate')
         catalog['endDate'] = CatalogFieldIndex('_get_endDate')
         catalog['keywords'] = CatalogKeywordIndex('_get_keywordsList')
-        catalog['category'] = CatalogKeywordIndex('_catName')
+        catalog['category'] = CatalogKeywordIndex('_get_categoryList')
         # I define as Text because I would permit searched for part of names
         catalog['rolesVals'] = CatalogTextIndex('_get_roles')
         catalog['person'] = CatalogTextIndex('_get_person')
@@ -61,7 +61,7 @@ class RepozeCatalog():
         transaction.commit()
 
         
-    def indicizeConference(self, obj, catalog=None):
+    def indexConference(self, obj, catalog=None):
         if not catalog: catalog = self.catalog
         fid = ut.getFid(obj)
         doc_id = catalog.document_map.new_docid()
@@ -71,6 +71,7 @@ class RepozeCatalog():
         obj._get_sorter = str(obj.getTitle()).lower().replace(" ", "")[:10]
         obj._get_collection = [ut.get_type(obj, '')]
         obj._get_keywordsList = []     
+        obj._get_categoryList = ut.getCatFid(obj)
         if hasattr(obj, '_keywords') and len(obj._keywords)>0: 
              obj._get_keywordsList = obj.getKeywords().split('\n')
         obj._get_roles = ut.getRolesValues(obj)    
@@ -82,7 +83,7 @@ class RepozeCatalog():
         catalog.index_doc(doc_id, obj)    
 
 
-    def indicizeContribution(self, obj, catalog=None):
+    def indexContribution(self, obj, catalog=None):
         if not catalog: catalog = self.catalog
         doc_id = catalog.document_map.new_docid()
         fid = ut.getFid(obj)
@@ -117,7 +118,7 @@ class RepozeCatalog():
         catalog.index_doc(doc_id, obj)
 
 
-    def indicizeMaterial(self, obj, catalog=None):
+    def indexMaterial(self, obj, catalog=None):
         if not catalog: catalog = self.catalog
         doc_id = catalog.document_map.new_docid()
         fid = ut.getFid(obj)
@@ -141,20 +142,18 @@ class RepozeCatalog():
                                 
                 
     def index(self, conf):   
-        if 'Conference' in typesToIndicize:
-            self.indicizeConference(conf)
+        if 'Conference' in typesToIndex:
+            self.indexConference(conf)
 
-        if 'Contribution' in typesToIndicize:
+        if 'Contribution' in typesToIndex:
             for talk in conf.getContributionList():
-                talk._catName = conf._catName                   
-                self.indicizeContribution(talk)
+                talk._get_categoryList = ut.getCatFid(conf)
+                self.indexContribution(talk)
 
-        if 'Material' in typesToIndicize:
+        if 'Material' in typesToIndex:
             for mat in conf.getAllMaterialList():
-                print "qui",vars(mat)
-                mat._catName = conf._catName                
+                mat._get_categoryList = ut.getCatFid(conf)
                 for res in mat.getResourceList():
-                    print "res..."
                     ftype = res.getFileType()
                     fname = res.getFileName()
                     fpath = res.getFilePath()
@@ -170,7 +169,7 @@ class RepozeCatalog():
                             pass
                         mat._content = content
                         print "indexing material:",fpath    
-                        self.indicizeMaterial(mat)
+                        self.indexMaterial(mat)
         transaction.commit() 
 
     def _unindexFid(self, fid):
@@ -182,14 +181,14 @@ class RepozeCatalog():
 
         
     def unindex(self, conf):    
-        if 'Material' in typesToIndicize:
+        if 'Material' in typesToIndex:
             for mat in conf.getAllMaterialList():
                 for obj in mat.getResourceList():
                     self._unindexFid(ut.getFid(obj))
-        if 'Contribution' in typesToIndicize:
+        if 'Contribution' in typesToIndex:
             for obj in conf.getContributionList():
                 self._unindexFid(ut.getFid(obj))
-        if 'Conference' in typesToIndicize:
+        if 'Conference' in typesToIndex:
             self._unindexFid(ut.getFid(conf))
         transaction.commit() 
 

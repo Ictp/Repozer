@@ -57,8 +57,8 @@
                         <td>
                             <select name="category">                  
                                 <option value="" ${"selected" if category=="" else ""}>${ _("All")}</option>
-                                % for cat in catnames:
-                                    <option value="${cat}" ${"selected" if category==cat else ""}>${cat}</option>
+                                % for catkey in categories.keys():
+                                    <option value="${catkey}" ${"selected" if category==catkey else ""}>${categories[catkey]}</option>
                                 % endfor
                             </select>
                         </td>

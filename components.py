@@ -41,7 +41,7 @@ from zope.interface import implements
 
 import MaKaC.services.implementation.conference as conference
 
-from indico.ext.search.repozer.options import typesToIndicize
+from indico.ext.search.repozer.options import typesToIndex
 
 
 # This is just until ROLES will be integrated in Indico with hook on event listener
@@ -87,7 +87,7 @@ class ObjectChangeListener(Component):
     implements(IMetadataChangeListener, IObjectLifeCycleListener)
 
     def toIndicize(self,obj):
-        return type(obj).__name__ in typesToIndicize
+        return type(obj).__name__ in typesToIndex
 
     def created(self, obj, owner):
         if self.toIndicize(obj):

@@ -32,5 +32,5 @@ from indico.core.config import Config
 globalOptions = []
 
 # MATERIAL not yet available
-#typesToIndicize = ['Conference','Contribution','Material']
-typesToIndicize = ['Conference','Contribution']
+#typesToIndex = ['Conference','Contribution','Material']
+typesToIndex = ['Conference','Contribution']
