@@ -10,10 +10,7 @@ except: from indico.web.http_api.fossils import IConferenceMetadataWithContribsF
 from indico.web.http_api.util import get_query_parameter
 from MaKaC.conference import ConferenceHolder
 
-#from repoze.catalog.catalog import FileStorageCatalogFactory
-#from repoze.catalog.catalog import ConnectionManager
 from indico.ext.search.repozer.repozeIndexer import RepozeCatalog
-
 from repoze.catalog.query import *
 
 from datetime import datetime
@@ -58,15 +55,9 @@ class SearchFetcher(IteratedDataFetcher):
         'subcontributions': IConferenceMetadataWithSubContribsFossil,
         'sessions': IConferenceMetadataWithSessionsFossil
     }
-        
     
         
     def searchRepoze(self, params):
-        #plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
-        #DBpath = plugin.getOptions()["DBpath"].getValue()   
-        #factory = FileStorageCatalogFactory(DBpath,'repoze_catalog')
-        #manager = ConnectionManager()
-        #catalog = factory(manager)
         catalog = RepozeCatalog().catalog
         
         localTimezone = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()

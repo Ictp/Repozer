@@ -64,7 +64,7 @@ def buildCatalog():
             
     # Pack it when finished
     print "Packing...."
-    db.DBMgr.getInstance().pack()
+    #db.DBMgr.getInstance().pack()
     print "Done."
     
     
