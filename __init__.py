@@ -20,6 +20,5 @@
 __metadata__ = {
     'name': 'Repozer',
     'type': 'search',
-    'description': 'Repoze Search Engine Agent.',
-    'version':'0.9'
+    'description': 'Indico search plugin',
     }
