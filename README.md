@@ -27,29 +27,22 @@ We strongly suggest you to install your Indico instance from SOURCE:
     http://indico-software.org/wiki/Dev/GettingStarted
 Otherwise, you will have to change your source files in 
     /<Indico path>/lib/python2.6/site-packages    
-
+*Indico v. 1.2 is REQUIRED*
     
 
 
 ### STEP 1: Install Repoze staff
 
-- Install Repoze in your Indico instance:
 
-```
-    $ pip install repoze.catalog
-```
 
-- go to "<Indico path>/src/indico/ext/search/" and do:
+- Go to "<Indico path>/src/indico/ext/search/" and do:
 
 ```
     git clone https://github.com/Ictp/Repozer.git repozer
 ```
 
-- Edit "<Indico path>/src/setup.py", add @566 (right below "search.invenio = indico.ext.search.invenio")
+*This should also install repoze.catalog . If it fails, you can do it manually: pip install repoze.catalog*
 
-```
-    search.repozer = indico.ext.search.repozer
-```
 
 - Save and from shell in <Indico path>/src/:
 
