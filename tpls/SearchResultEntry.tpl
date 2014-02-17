@@ -18,6 +18,7 @@ if result.getDescription() != None:
     entryDesc = truncateTitle(result.getDescriptionText(), maxSize=300)
 else:
     fullDesc = entryDesc = ''
+entryDesc = entryDesc.encode('utf-8')
 %>
 
     <div class="searchResultDescription">

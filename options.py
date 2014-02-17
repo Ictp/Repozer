@@ -31,6 +31,8 @@ from indico.core.config import Config
 #]
 globalOptions = []
 
-# MATERIAL not yet available
-#typesToIndex = ['Conference','Contribution','Material']
+# By default Material indexing is disabled
 typesToIndex = ['Conference','Contribution']
+
+# If you want to index Material, just COMMENT the upper line and UNCOMMENT the one below
+#typesToIndex = ['Conference','Contribution','Material']

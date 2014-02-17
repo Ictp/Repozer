@@ -78,6 +78,47 @@ this will create the repozecatalog inside your Data.fs (you should see percentag
 
 
 
+MATERIAL INDEXING!
+------------------
+
+With Repozer 0.9.2 Materials are now indexable!!! You will be able to search for:
+'pdf','doc','docx','odt','rtf','wpd','txt','html','xlsx','ppt','pptx','xls','ods','odp','sxc','sxw','csv','sxi'
+
+... but you have to follow some additional STEPS:
+
+
+- INSTALL Poppler and OpenOffice/LibreOffice, with headless pkg:
+- -    yum install poppler
+- -    yum install libreoffice
+- -    yum install libreoffice-headless 
+    
+- UNCOMMENT line 13 in tpls/SearchResult.tpl : to make Material visible in the 'search in' combo
+
+- EDIT options.py and comment/uncomment as specified
+
+- START OpenOffice/LibreOffice service: 
+
+```
+    $ soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard 
+```
+
+- DONE! Now you can re-run createRepozeCatalog.py for indexing all your Materials!
+
+- IMPORTANT: Right now, I do not have found an hook to the add/remove/edit Material event, 
+so if you add/remove/edit Materials the Repozer Catalog wont know that! :(
+The suggeste way to solve the issue is a CRONJOB that, once a day for example, checks for edited Conferences and
+re-index them. I've prepared a python script that achieve this: manage/updateMaterials.py
+So, last suggested STEP:
+
+- PUT THIS in your cronjob:
+
+```
+    0 2 * * * /usr/bin/python /opt/indico/src/indico/ext/search/repozer/manage/updateMaterials.py 
+```
+
+Search also inside Materials WORKS now with different charsets!!!
+
+
 
 BEWARE!
 -------
@@ -85,7 +126,6 @@ BEWARE!
 There are some things that you should notice:
 - Results pagination has been disabled and results are limited to 5000 
     (you can change this behaviour by yourself by looking into code)
-- Search is inside Events, and Contributions, not Materials
 - You can add/edit indexing by editing repozeIndexer.py and createRepozeCatalog.py
 
 

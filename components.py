@@ -53,11 +53,15 @@ if 'ConferenceRolesModification' in defclasses:
         """
         Conference roles modification
         """
+        def toIndex(self,obj):
+            return type(obj).__name__ in typesToIndex and not(obj.hasAnyProtection())
+        
         def _handleSet(self):
-            conference.ConferenceRolesModification._handleSet(self)
-            rc = RepozeCatalog()
-            rc.reindex(self._target)
-            rc.closeConnection()
+            if self.toIndex(obj):
+                conference.ConferenceRolesModification._handleSet(self)
+                rc = RepozeCatalog()
+                rc.reindex(self._target)
+                rc.closeConnection()
     conference.methodMap["main.changeRoles"] = ConferenceRolesModificationRepozer
 
 
@@ -68,11 +72,17 @@ class ConferenceKeywordsModificationRepozer( conference.ConferenceKeywordsModifi
     """
     Conference keywords modification
     """
+    
+    def toIndex(self,obj):
+        return type(obj).__name__ in typesToIndex and not(obj.hasAnyProtection())
+        
     def _handleSet(self):
-        conference.ConferenceKeywordsModification._handleSet(self)
-        rc = RepozeCatalog()
-        rc.reindex(self._target)
-        rc.closeConnection()        
+        if self.toIndex(obj):
+            conference.ConferenceKeywordsModification._handleSet(self)
+            rc = RepozeCatalog()
+            rc.reindex(self._target)
+            rc.closeConnection()        
+            
 conference.methodMap["main.changeKeywords"] = ConferenceKeywordsModificationRepozer        
 
 
@@ -87,7 +97,7 @@ class ObjectChangeListener(Component):
     implements(IMetadataChangeListener, IObjectLifeCycleListener)
 
     def toIndex(self,obj):
-        return type(obj).__name__ in typesToIndex
+        return type(obj).__name__ in typesToIndex and not(obj.hasAnyProtection())
 
     def created(self, obj, owner):
         if self.toIndex(obj):

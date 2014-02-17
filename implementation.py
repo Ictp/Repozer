@@ -36,7 +36,7 @@ from urllib import urlencode
 import urllib2
 
 from MaKaC.plugins.base import PluginsHolder
-from indico.ext.search.repozer.repozeIndexer import RepozeCatalog
+from indico.ext.search.repozer.repozeIndexer import RepozeCatalog, RepozerMaterial
 from repoze.catalog.query import *
 
 
@@ -50,19 +50,20 @@ SEA = SEATranslator("repozer")
 
 class SearchResultRepozer(object):    
     
-    #def __init__(self, fid, title, description, startDate):
     def __init__(self, fid):
         self._fid = fid
         self.confId, self.sessionId, self.talkId, self.materialId = self._fid.split("|") 
         self.ch = ConferenceHolder()
             
     def isVisible(self, user):
-        target = self.getTarget()
-        if target:
-            return target.canView(user)
-        else:
-            Logger.get('search').warning("referenced element %s does not exist!" % self.getCompoundId())
-            return False
+        # Only PUBLIC documents are Indexed
+        return True
+#        target = self.getTarget()
+#        if target:
+#            return target.canView(user)
+#        else:
+#            Logger.get('search').warning("referenced element %s does not exist!" % self.getCompoundId())
+#            return False
             
     @classmethod
     def create(cls, fid):
@@ -132,17 +133,43 @@ class ContributionEntryRepozer(ConferenceEntryRepozer):
         return str(urlHandlers.UHContributionDisplay.getURL(confId=self.confId, contribId=self.getId()))
 
 
-class MaterialEntryRepozer(ConferenceEntryRepozer):
+class MaterialEntryRepozer(ConferenceEntryRepozer,RepozerMaterial):
 
-    def getId(self):
-        return self.materialId
-
+    def __init__(self, fid=None):
+        self._fid = fid
+        self.confId, self.sessionId, self.talkId, self.materialId = self._fid.split("|") 
+        self.ch = ConferenceHolder()
+        conf = self.ch.getById(self.confId)
+        self.matId, self.resId = self.materialId.split('/')
+        obj = None
+        if self.talkId: # Material inside Talk
+            if self.sessionId: # Talk inside Session
+                s = conf.getSessionById(self.sessionId)
+                obj = s.getContributionById(self.talkId)
+            else: obj = conf.getContributionById(self.talkId)
+        else: obj = conf
+        
+        self.mat = obj.getMaterialById(self.matId)
+        self.res = self.mat.getResourceById(self.resId)
+        self.robj = RepozerMaterial(self.res)
+        self.ext = self.robj.ext
+            
+    def isVisible(self, user):
+        # Only PUBLIC documents are Indexed
+        return True
+        
     def getMaterial(self):
         try:
-            return self.ch.getById(self.confId).getMaterialById(self.materialId)
+            return self.robj
         except:
             return None
-            
+    
+    def getTitle(self):
+        return self.robj.getTitle()
+    
+    def getDescription(self):
+        return ''
+                    
     def getStartDate(self, aw):
         return None
                 
@@ -150,8 +177,12 @@ class MaterialEntryRepozer(ConferenceEntryRepozer):
         return self.getMaterial()
         
     def getURL(self):
-        return self.ch.getById(self.confId).getURL().replace('/indico/e/','/indico/event/') + '/material/' + self.materialId
-        #return str(urlHandlers.UHContributionDisplay.getURL(confId=self.confId, contribId=self.getId()))        
+        suffix = ''
+        if self.sessionId: suffix += '/session/' + self.sessionId
+        if self.talkId: suffix += '/contribution/' + self.talkId
+        suffix += '/material/' + self.materialId + self.ext            
+        return self.ch.getById(self.confId).getURL().replace('/indico/e/','/indico/event/') + suffix
+        
         
 class RepozerBaseSEA:
     _id = "repozer"
@@ -308,7 +339,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
                                                    sortOrder = self._filteredParams['sortOrder'])
                                                    
             results.extend(r)
-
+            
             # filter
             allResultsFiltered = False
             for r in results:
@@ -330,7 +361,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
             start += numRequest
 
         Logger.get("search").debug("%s %s %s" % (len(fResults), numHits, number))
-
+        
         return (fResults, numHits, shortResult, record)
 
 
@@ -342,7 +373,6 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
             @param kwargs: Input parameters
 
         """
-
         
         Logger.get('search.SEA').debug('Translating parameters...')
         #finalArgs = self.translateParameters(kwargs)
@@ -352,6 +382,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         (numPreResults, preResults) = self._fetchResultsFromServer(finalArgs )
 
         Logger.get('search.SEA').debug('Preprocessing results...')
+
         results = self.preProcess(preResults)
 
         Logger.get('search').debug('Done!')
@@ -381,7 +412,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
                 searchSMR = True
                 keywords = parameters['p'].replace(' ','')
             else:                  
-                title = parameters['p']
+                title = parameters['p'].decode('utf8')
                 titleManaged = title
                 if parameters['wildcards']:
                     ts = title.split(" ")
@@ -431,11 +462,10 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
             query = query & InRange('startDate',startDate, endDate)  
         # Ictp specific:
         if searchSMR:
-            query = Any('keywords', keywords)
-          
-    
+            query = Any('keywords', keywords)    
         
-        numdocs, results = catalog.query(query, sort_index=sortField, reverse=sortReverse, limit=self._pagination)        
+        numdocs, results = catalog.query(query, sort_index=sortField, reverse=sortReverse, limit=self._pagination) 
+      
         # Convert doc_ids to fid
         results = [catalog.document_map.address_for_docid(result) for result in results]                  
         return (numdocs, results)

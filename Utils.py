@@ -36,9 +36,8 @@ def getTextFromHtml(txt):
     s = ''
     if txt: 
         try:
-            s = html.fromstring(txt.decode('utf8','ignore')).text_content()
-            # Change this if you need different encoding
-            s = s.encode('ascii','ignore')
+            sp = html.fromstring(txt).text_content()
+            s = ''.join(sp.splitlines())
         except: 
             s = txt
     return s
@@ -51,6 +50,7 @@ def getFid(obj):
     """
     fid = "|||"
     cname = type(obj).__name__
+    if hasattr(obj, '__type__'): cname = obj.__type__
     if cname == 'Conference':
         fid = str(obj.getId()+"|||")
     if cname == 'Contribution':
@@ -59,7 +59,7 @@ def getFid(obj):
         if obj.getSession():
             fid += str(obj.getSession().getId())
         fid += "|"+str(obj.getId()) + "|" 
-    if cname == 'Material':        
+    if cname == 'Material':      
         conf = obj.getConference()        
         fid = str(conf.getId()) + "|"        
         if obj.getSession():
@@ -67,7 +67,7 @@ def getFid(obj):
         fid += "|"
         if obj.getContribution():
             fid += str(obj.getContribution().getId())
-        fid += "|" + str(obj.getId())      
+        fid += "|" + str(obj.getId()) 
     return fid
 
 
@@ -80,9 +80,10 @@ def getCatFid(obj):
     while catowner:
         catId += "|"+catowner.getId()
         if catowner.name != 'Home':
-            catList.append(catId)
+            catList.append(catId.decode('utf8'))
         catowner = catowner.getOwner()
     return catList
+
     
 
 def getTextFromAvatar(alist):

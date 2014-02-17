@@ -26,7 +26,6 @@
             <select class="UIFieldSpan" name="sortField" style="display: inline;">
                 <option value="" ${"selected" if sortField=="" else ""}>${ _("Date")}</option>
                 <option value="titleSorter" ${"selected" if sortField=="titleSorter" else ""}>${ _("Title")}</option>
-                <!--<option value="author" ${"selected" if sortField=="author" else ""}>${ _("Author")}</option>-->
           </select>
         </td>
     </tr>
