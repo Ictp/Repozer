@@ -1,7 +1,0 @@
-setup.py
-repozer.egg-info/PKG-INFO
-repozer.egg-info/SOURCES.txt
-repozer.egg-info/dependency_links.txt
-repozer.egg-info/entry_points.txt
-repozer.egg-info/requires.txt
-repozer.egg-info/top_level.txt

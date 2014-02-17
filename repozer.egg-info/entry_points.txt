@@ -1,4 +1,0 @@
-
-            [indico.ext]
-            search.repozer = indico.ext.search.repozer
-        

@@ -99,7 +99,7 @@ With Repozer 0.9.2 Materials are now indexable!!! You will be able to search for
 
 - IMPORTANT: Right now, I do not have found an hook to the add/remove/edit Material event, 
 so if you add/remove/edit Materials the Repozer Catalog wont know that! :(
-The suggeste way to solve the issue is a CRONJOB that, once a day for example, checks for edited Conferences and
+The suggested way to solve the issue is a CRONJOB that, once a day for example, checks for edited Conferences and
 re-index them. I've prepared a python script that achieve this: manage/updateMaterials.py
 So, last suggested STEP:
 
