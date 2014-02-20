@@ -44,10 +44,10 @@ Otherwise, you will have to change your source files in
 *This should also install repoze.catalog . If it fails, you can do it manually: pip install repoze.catalog*
 
 
-- Save and from shell in <Indico path>/src/:
+- Save and from shell in <Indico path>/src/indico/ext/search/repozer:
 
 ```
-    $ python setup.py develop_config
+    $ python setup.py install
 ```
     
 
