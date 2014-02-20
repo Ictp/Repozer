@@ -41,7 +41,7 @@ def buildCatalog():
     curnum = 0
     curper = 0
     
-    startFrom = 1889
+    startFrom = 0
     
     print "Events found:", totnum
         
