@@ -42,7 +42,7 @@ from zope.interface import implements
 import MaKaC.services.implementation.conference as conference
 
 from indico.ext.search.repozer.options import typesToIndex
-
+import hashlib, pickle
 
 # This is just until ROLES will be integrated in Indico with hook on event listener
 defclasses = []
@@ -96,12 +96,17 @@ class ObjectChangeListener(Component):
 
     implements(IMetadataChangeListener, IObjectLifeCycleListener)
 
+#     def getHash(self, obj):
+#         arr = [str(getattr(obj, x)).decode('utf8','ignore') for x in vars(obj).keys() if x != '_modificationDS']
+#         return ''.join(arr)
+        
     def toIndex(self,obj):
         return type(obj).__name__ in typesToIndex and not(obj.hasAnyProtection())
 
     def created(self, obj, owner):
         if self.toIndex(obj):
             rc = RepozeCatalog()
+            #obj.md5 = self.getHash(obj)
             rc.index(obj)
             rc.closeConnection()
 
@@ -125,8 +130,10 @@ class ObjectChangeListener(Component):
             
     def infoChanged(self, obj):
         if self.toIndex(obj):
+            #print "...indexing..."
             rc = RepozeCatalog()
-            rc.reindex(obj)
+            # I dont want to reindex Material, it takes soo long
+            rc.reindex(obj,False)
             rc.closeConnection()
                             
     def eventDatesChanged(cls, obj, oldStartDate, oldEndDate, newStartDate, newEndDate):

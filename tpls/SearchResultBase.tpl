@@ -78,7 +78,20 @@
                     <tr>
                         <td style="text-align: right;">${ _("Keywords")}:</td>
                         <td>
-                            <input style="height:20px; width:180px; vertical-align: middle;" type="text" name="keywords" value="${keywords}" />
+                            <select name="keywords">                  
+                                <option value="" ${"selected" if keyword=="" else ""}>${ _("All")}</option>
+                                % for keyw in avakeywords:
+                                    <option value="${keyw}" title="${keyw}" ${"selected" if keywords==keyw else ""}>
+                                        % if len(keyw) < 26:
+                                            ${keyw}
+                                        % endif
+                                        % if len(keyw) >= 26:
+                                            ${keyw[:23]}...
+                                        % endif                                    
+                                    </option>
+                                % endfor
+                            </select>
+                            
                         </td>
                     </tr> 
                       

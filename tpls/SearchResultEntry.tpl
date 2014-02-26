@@ -3,8 +3,10 @@
 
 <li class="${"searchResultEvent" if type(result) == ConferenceEntry else "searchResultContribution"}">
     % if result.getTitle():
-        <a class="searchResultTitle" href="${ result.getURL().replace('%','%%') }">${ result.getTitle() }</a>
-    % endif
+        <a class="searchResultTitle" href="${ result.getURL().replace('%','%%') }">        
+        ${result.getTitle()}
+        </a>
+    % endif    
     % if result.getStartDate(accessWrapper):
          <small style="display: block;">${ result.getStartDate(accessWrapper).strftime("%Y-%m-%d %H:%M:%S (%Z)") }</small>
     % endif

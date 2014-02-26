@@ -119,7 +119,7 @@ class ContributionEntryRepozer(ConferenceEntryRepozer):
 
     def getId(self):
         return self.talkId 
-                    
+                            
     def getContribution(self):
         try:
             return self.ch.getById(self.confId).getContributionById(self.talkId)
@@ -516,12 +516,21 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         params['contribResults'] = contribResults
                 
         categories = {}
+
         for cat in conference.CategoryManager().getList():
             catparent = cat.getOwner()
             if catparent and catparent.getCategory().getId() == '0':
                 categories[cat.getId()] = cat.name
 
+        keywords = []
+        for conf in conference.ConferenceHolder().getValuesToList():
+            for keyword in conf.getKeywords().split('\n'):
+                if not(keyword in keywords) and not(keyword.startswith('smr')) and not(keyword.startswith('expparts')) and not(keyword.startswith('siscode')) and keyword != '':
+                    keywords.append(keyword)
+        keywords.sort()
+        
         params['categories'] = categories
+        params['avakeywords'] = keywords
 
         params['nEventResult'] = nEvtRec
         params['nContribResult'] = nContRec
