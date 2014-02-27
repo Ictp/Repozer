@@ -74,7 +74,7 @@ this will create the repozecatalog inside your Data.fs (you should see percentag
 MATERIAL INDEXING!
 ------------------
 
-With Repozer 0.9.2 Materials are now indexable!!! You will be able to search for:
+With Repozer > 0.9.2 Materials are now indexable!!! You will be able to search for:
 'pdf','doc','docx','odt','rtf','wpd','txt','html','xlsx','ppt','pptx','xls','ods','odp','sxc','sxw','csv','sxi'
 
 ... but you have to follow some additional STEPS:
@@ -87,7 +87,10 @@ With Repozer 0.9.2 Materials are now indexable!!! You will be able to search for
     
 - UNCOMMENT line 13 in tpls/SearchResult.tpl : to make Material visible in the 'search in' combo
 
-- EDIT options.py and comment/uncomment as specified
+- EDIT manage/createRepozeCatalog.py and set:
+```
+    indexMaterial = True
+```
 
 - START OpenOffice/LibreOffice service: 
 
@@ -119,7 +122,6 @@ BEWARE!
 There are some things that you should notice:
 - Results pagination has been disabled and results are limited to 5000 
     (you can change this behaviour by yourself by looking into code)
-- You can add/edit indexing by editing repozeIndexer.py and createRepozeCatalog.py
 
 
 HTTP_API.PY
