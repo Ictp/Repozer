@@ -230,20 +230,20 @@ class RepozeCatalog():
         return
     
                 
-    def index(self, obj, withMaterial=True):   
+    def index(self, obj, idxMaterial=False):   
         fid = ut.getFid(obj)
         confId, sessionId, talkId, materialId = fid.split("|")
         conf = self.ch.getById(confId)        
         if 'Conference' in typesToIndex:
             self.indexConference(conf)
-            if 'Material' in typesToIndex and withMaterial:            
+            if idxMaterial:            
                 for mat in conf.getAllMaterialList(): # Index Material inside Conference
                     self._indexMat(mat)
 
         if 'Contribution' in typesToIndex:
             for talk in conf.getContributionList():
                 self.indexContribution(talk)
-                if 'Material' in typesToIndex and withMaterial: 
+                if idxMaterial: 
                     for mat in talk.getAllMaterialList(): # Index Material inside Contributions
                         self._indexMat(mat)
                              
@@ -266,7 +266,7 @@ class RepozeCatalog():
         transaction.commit() 
 
         
-    def reindex(self, c, withMaterial=True):
+    def reindex(self, c, idxMaterial=False):
         fid = ut.getFid(c)
         confId, sessionId, talkId, materialId = fid.split("|")
         # Check if conference still exist       
@@ -276,7 +276,7 @@ class RepozeCatalog():
         except: pass            
         if cc:
             self.unindex(cc)
-            self.index(cc,withMaterial)
+            self.index(cc,idxMaterial)
 
         
     def closeConnection(self):

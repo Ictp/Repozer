@@ -1,0 +1,6 @@
+0.9.3
+*****
+
+- Material indexing Disable by default in Repozer index method
+- Keywords in search form is now a combo with tooltip
+- Charset encode fixed in SearchResultEntry

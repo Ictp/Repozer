@@ -29,6 +29,12 @@ from repoze.catalog.query import *
 import transaction
 from datetime import datetime
 
+############################################
+# CHANGE HERE if you want to index Materials
+# BEWARE: This will increase your Data.fs
+############################################
+
+indexMaterial = False
 
 db.DBMgr.getInstance().startRequest()
 rc = RepozeCatalog()
@@ -78,7 +84,7 @@ def buildCatalog():
 #                 transaction.commit()     
 
                 
-            rc.index(c) 
+            rc.index(c, indexMaterial) 
             transaction.commit()
         curnum += 1
 

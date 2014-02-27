@@ -76,17 +76,17 @@
 
 
                     <tr>
-                        <td style="text-align: right;">${ _("Keywords")}:</td>
+                        <td style="text-align: right;">${ _("Keyword")}:</td>
                         <td>
-                            <select name="keywords">                  
+                            <select name="keywords" id="keywords">                  
                                 <option value="" ${"selected" if keyword=="" else ""}>${ _("All")}</option>
                                 % for keyw in avakeywords:
-                                    <option value="${keyw}" title="${keyw}" ${"selected" if keywords==keyw else ""}>
-                                        % if len(keyw) < 26:
+                                    <option class="itemTool" value="${keyw}" title="${keyw}" ${"selected" if keywords==keyw else ""}>
+                                        % if len(keyw) < 30:
                                             ${keyw}
                                         % endif
-                                        % if len(keyw) >= 26:
-                                            ${keyw[:23]}...
+                                        % if len(keyw) >= 30:
+                                            ${keyw[:27]}...
                                         % endif                                    
                                     </option>
                                 % endfor
@@ -127,6 +127,32 @@
     </div>
 </div>
 
+
+
+
+<script type="text/javascript" src="/indico/js/lib/jquery.js"></script>
+<script type="text/javascript" src="/indico/js/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="/indico/js/animation-min.js"></script>
+<script type="text/javascript" src="/indico/js/container-min.js"></script>
+<script type="text/javascript">
+	$(function() {
+
+		for ( var i = 0; i < $('option').length; i++ ) {
+			$('a:eq(' + i + ')').attr( 'id', 'link-' + i );
+
+			new YAHOO.widget.Tooltip("myTip", {
+				context: 'link-' + i,
+				effect: { effect:YAHOO.widget.ContainerEffect.FADE, duration:0.30 },
+				showdelay: 0
+			} );
+		}
+
+	});
+</script>
+
+
+
+
 <script type="text/javascript">
     $("#advancedOptionsText").click(function(){
         if($("#advancedOptions").is(":hidden")){
@@ -139,11 +165,14 @@
         }
     });
 
+    // Start showing advanced options
+    $( "#advancedOptionsText" ).trigger( "click" );
+
+
     $("#startDatePlace").datepicker({ dateFormat: "dd/mm/yy", firstDay: 1, defaultDate:"${startDate}",changeMonth: true,
       changeYear: true});
     $("#endDatePlace").datepicker({ dateFormat: "dd/mm/yy",  firstDay: 1, defaultDate:"${endDate}",changeMonth: true,
       changeYear: true});
-    
     
 </script>
 

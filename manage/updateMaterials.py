@@ -51,7 +51,7 @@ def updateCatalog():
     for conf in ConferenceHolder().getValuesToList():
         if conf.getModificationDate() >= cDate:
             results.append(conf)
-            rc.reindex(conf) 
+            rc.reindex(conf, True) 
     
     if results:
         print "Updated", len(results), "Conference(s)."
