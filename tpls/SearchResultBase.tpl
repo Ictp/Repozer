@@ -130,25 +130,7 @@
 
 
 
-<script type="text/javascript" src="/indico/js/lib/jquery.js"></script>
-<script type="text/javascript" src="/indico/js/yahoo-dom-event.js"></script>
-<script type="text/javascript" src="/indico/js/animation-min.js"></script>
-<script type="text/javascript" src="/indico/js/container-min.js"></script>
-<script type="text/javascript">
-	$(function() {
 
-		for ( var i = 0; i < $('option').length; i++ ) {
-			$('a:eq(' + i + ')').attr( 'id', 'link-' + i );
-
-			new YAHOO.widget.Tooltip("myTip", {
-				context: 'link-' + i,
-				effect: { effect:YAHOO.widget.ContainerEffect.FADE, duration:0.30 },
-				showdelay: 0
-			} );
-		}
-
-	});
-</script>
 
 
 
@@ -174,6 +156,27 @@
     $("#endDatePlace").datepicker({ dateFormat: "dd/mm/yy",  firstDay: 1, defaultDate:"${endDate}",changeMonth: true,
       changeYear: true});
     
+</script>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="js/animation-min.js"></script>
+<script type="text/javascript" src="js/container-min.js"></script>
+
+<script type="text/javascript">
+	$(function() {
+
+		for ( var i = 0; i < $('option').length; i++ ) {
+			$('a:eq(' + i + ')').attr( 'id', 'link-' + i );
+
+			new YAHOO.widget.Tooltip("myTip", {
+				context: 'link-' + i,
+				effect: { effect:YAHOO.widget.ContainerEffect.FADE, duration:0.30 },
+				showdelay: 0
+			} );
+		}
+
+	});
 </script>
 
 <%block name ="scripts">
