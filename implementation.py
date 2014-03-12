@@ -405,7 +405,8 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         keywords = []
         tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
         #print "PARAM=",parameters        
-                    
+        titleManaged = title
+        
         if parameters['p'] != '':
             # Ictp specific:
             if parameters['p'].startswith('smr'):
@@ -413,7 +414,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
                 keywords = parameters['p'].replace(' ','')
             else:                  
                 title = parameters['p'].decode('utf8')
-                titleManaged = title
+                
                 if parameters['wildcards']:
                     ts = title.split(" ")
                     titleManaged = "*"+"* *".join(ts)+"*"
