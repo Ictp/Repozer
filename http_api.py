@@ -38,8 +38,11 @@ class SearchHook(HTTPAPIHook):
         self._start_date = get_query_parameter(self._queryParams, ['start_date'], '1970/01/01')
         self._end_date = get_query_parameter(self._queryParams, ['end_date'], None)
         self._today = get_query_parameter(self._queryParams, ['today'], None)
+        self._todaybeyond = get_query_parameter(self._queryParams, ['todaybeyond'], None)
         self._category = get_query_parameter(self._queryParams, ['category'], None)
         self._keywords = get_query_parameter(self._queryParams, ['keywords'], None)
+        self._keywordsAnd = get_query_parameter(self._queryParams, ['keywordsAnd'], None)
+        self._limitQuery = get_query_parameter(self._queryParams, ['limit'], None)        
         # To be implemented...
         self._text = get_query_parameter(self._queryParams, ['text'], None)
         
@@ -77,11 +80,20 @@ class SearchFetcher(IteratedDataFetcher):
         if params._today:
             td = params._today.split('/')
             today_ts = timezone(localTimezone).localize(datetime(int(td[0]), int(td[1]), int(td[2]), 23, 59))
-            query = Le('startDate',today_ts) & Ge('endDate',today_ts)            
+            query = Le('startDate',today_ts) & Ge('endDate',today_ts) 
+
+        if params._todaybeyond:
+            td = params._todaybeyond.split('/')
+            today_ts = timezone(localTimezone).localize(datetime(int(td[0]), int(td[1]), int(td[2]), 23, 59))
+            query = Le('startDate',today_ts) & Ge('endDate',today_ts) | Ge('startDate',today_ts)          
         
         if params._keywords:
             kw = params._keywords.split(',')
             query = query & Any('keywords', kw)
+            
+        if params._keywordsAnd:
+            kw = params._keywordsAnd.split(',')
+            query = query & All('keywords', kw)
         
         if params._category:
             kw = params._category.split(',')
@@ -89,8 +101,14 @@ class SearchFetcher(IteratedDataFetcher):
         
         # Just return Conference objs
         query = query & Eq('collection', 'Conference')
-                
-        numdocs, results = catalog.query(query)
+               
+               
+          
+        if params._limitQuery:
+            numdocs, results = catalog.query(query, limit=params._limitQuery)
+        else:
+            numdocs, results = catalog.query(query)
+            
         results = [catalog.document_map.address_for_docid(result) for result in results]     
         
         res = []
