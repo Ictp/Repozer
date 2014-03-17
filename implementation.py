@@ -464,11 +464,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         # Ictp specific:
         if searchSMR:
             query = Any('keywords', keywords)    
-        
-        
-        #query = Eq('title', 'math')
-        print "QUERY=",query,"___PAG=",self._pagination,"__TITLEMANAGED=",titleManaged
-        
+
         
         numdocs, results = catalog.query(query, sort_index=sortField, reverse=sortReverse, limit=self._pagination) 
       
