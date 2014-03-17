@@ -181,7 +181,7 @@ class MaterialEntryRepozer(ConferenceEntryRepozer,RepozerMaterial):
         if self.sessionId: suffix += '/session/' + self.sessionId
         if self.talkId: suffix += '/contribution/' + self.talkId
         suffix += '/material/' + self.materialId + self.ext            
-        return self.ch.getById(self.confId).getURL().replace('/indico/e/','/indico/event/') + suffix
+        return self.ch.getById(self.confId).getURL().replace('/e/','/event/') + suffix
         
         
 class RepozerBaseSEA:
@@ -194,7 +194,7 @@ class RepozerBaseSEA:
         self._noQuery = False
         # this is used also as query limit. default was 25. 
         # WARNING: paging needs to be implemented
-        self._pagination = 5000
+        self._pagination = 250
 
         if self._userLoggedIn:
             self._sessionHash = '%s_%s' % (session.sid, session.user.getId())
@@ -405,7 +405,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         keywords = []
         tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
         #print "PARAM=",parameters        
-        titleManaged = title
+        titleManaged = ''
         
         if parameters['p'] != '':
             # Ictp specific:
@@ -414,7 +414,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
                 keywords = parameters['p'].replace(' ','')
             else:                  
                 title = parameters['p'].decode('utf8')
-                
+                titleManaged = title
                 if parameters['wildcards']:
                     ts = title.split(" ")
                     titleManaged = "*"+"* *".join(ts)+"*"
@@ -464,6 +464,8 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         # Ictp specific:
         if searchSMR:
             query = Any('keywords', keywords)    
+        
+        
         
         numdocs, results = catalog.query(query, sort_index=sortField, reverse=sortReverse, limit=self._pagination) 
       

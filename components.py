@@ -44,6 +44,15 @@ import MaKaC.services.implementation.conference as conference
 from indico.ext.search.repozer.options import typesToIndex
 import hashlib, pickle
 
+
+
+def toIndex(obj):
+    plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
+    liveUpdate = plugin.getOptions()["liveUpdate"].getValue()
+    return liveUpdate and type(obj).__name__ in typesToIndex and not(obj.hasAnyProtection())
+
+
+
 # This is just until ROLES will be integrated in Indico with hook on event listener
 defclasses = []
 for name, obj in inspect.getmembers(conference, inspect.isclass):
@@ -53,11 +62,9 @@ if 'ConferenceRolesModification' in defclasses:
         """
         Conference roles modification
         """
-        def toIndex(self,obj):
-            return type(obj).__name__ in typesToIndex and not(obj.hasAnyProtection())
         
         def _handleSet(self):
-            if self.toIndex(obj):
+            if toIndex(obj):
                 conference.ConferenceRolesModification._handleSet(self)
                 rc = RepozeCatalog()
                 rc.reindex(self._target)
@@ -73,11 +80,10 @@ class ConferenceKeywordsModificationRepozer( conference.ConferenceKeywordsModifi
     Conference keywords modification
     """
     
-    def toIndex(self,obj):
-        return type(obj).__name__ in typesToIndex and not(obj.hasAnyProtection())
+
         
     def _handleSet(self):
-        if self.toIndex(obj):
+        if toIndex(obj):
             conference.ConferenceKeywordsModification._handleSet(self)
             rc = RepozeCatalog()
             rc.reindex(self._target)
@@ -100,36 +106,35 @@ class ObjectChangeListener(Component):
 #         arr = [str(getattr(obj, x)).decode('utf8','ignore') for x in vars(obj).keys() if x != '_modificationDS']
 #         return ''.join(arr)
         
-    def toIndex(self,obj):
-        return type(obj).__name__ in typesToIndex and not(obj.hasAnyProtection())
+
 
     def created(self, obj, owner):
-        if self.toIndex(obj):
+        if toIndex(obj):
             rc = RepozeCatalog()
             #obj.md5 = self.getHash(obj)
             rc.index(obj)
             rc.closeConnection()
 
     def moved(self, obj, fromOwner, toOwner):
-        if self.toIndex(obj):
+        if toIndex(obj):
             rc = RepozeCatalog()
             rc.reindex(obj)
             rc.closeConnection()
 
     def deleted(self, obj, oldOwner):
-        if self.toIndex(obj):
+        if toIndex(obj):
             rc = RepozeCatalog()
             rc.unindex(obj)
             rc.closeConnection()        
             
     def eventTitleChanged(self, obj, oldTitle, newTitle):
-        if self.toIndex(obj):
+        if toIndex(obj):
             rc = RepozeCatalog()
             rc.reindex(obj)
             rc.closeConnection()
             
     def infoChanged(self, obj):
-        if self.toIndex(obj):
+        if toIndex(obj):
             #print "...indexing..."
             rc = RepozeCatalog()
             # I dont want to reindex Material, it takes soo long
@@ -137,7 +142,7 @@ class ObjectChangeListener(Component):
             rc.closeConnection()
                             
     def eventDatesChanged(cls, obj, oldStartDate, oldEndDate, newStartDate, newEndDate):
-        if self.toIndex(obj):
+        if toIndex(obj):
             rc = RepozeCatalog()
             rc.reindex(obj)
             rc.closeConnection()                          
@@ -151,6 +156,7 @@ class PluginImplementationContributor(Component, Observable):
         
     def getPluginImplementation(self, obj):
         plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
+        #liveUpdate = plugin.getOptions()["liveUpdate"].getValue()
         #typeSearch = plugin.getOptions()["type"].getValue()
         return ("repozer", RepozerSEA)
 

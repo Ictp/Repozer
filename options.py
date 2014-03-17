@@ -29,7 +29,13 @@ from indico.core.config import Config
 #                  "editable": True,
 #                  "visible": True}),
 #]
-globalOptions = []
+globalOptions = [
+    ("liveUpdate", {"description" : "Repozer will index contents automatically",
+               "type": bool,
+               "defaultValue": True,
+               "editable": True,
+               "visible": True} ),
+]
 
 # By default Material indexing is disabled
 typesToIndex = ['Conference','Contribution']
