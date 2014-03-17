@@ -194,7 +194,7 @@ class RepozerBaseSEA:
         self._noQuery = False
         # this is used also as query limit. default was 25. 
         # WARNING: paging needs to be implemented
-        self._pagination = 5000
+        self._pagination = 250
 
         if self._userLoggedIn:
             self._sessionHash = '%s_%s' % (session.sid, session.user.getId())
