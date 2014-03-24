@@ -7,7 +7,7 @@ if __name__ == '__main__':
         author="Giorgio Pieretti",
         packages=find_packages(),
         include_package_data=True,
-        install_requires=["repoze.catalog",],
+        #install_requires=["repoze.catalog",],
         package_dir={'repozer': 'repozer'},
         entry_points="""
             [indico.ext]

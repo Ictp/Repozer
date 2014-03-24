@@ -389,6 +389,12 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
 
         return (numPreResults, results)
 
+    def addQuery(self, query, elem):
+        if not query:
+            return elem
+        else:
+            return query & elem
+
     def _fetchResultsFromServer(self, parameters):
 
         rc = RepozeCatalog()
@@ -407,6 +413,8 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         #print "PARAM=",parameters        
         titleManaged = ''
         
+        query = None
+        
         if parameters['p'] != '':
             # Ictp specific:
             if parameters['p'].startswith('smr'):
@@ -419,8 +427,10 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
                     ts = title.split(" ")
                     titleManaged = "*"+"* *".join(ts)+"*"
                 #print titleWilcard
-        else:
-            return (0, [])
+        #else:
+        #    return (0, [])
+        
+        
         if parameters['startDate'] != '':
             sdd,sdm,sdy = parameters['startDate'].split('/')
             startDate = timezone(tz).localize(datetime( int(sdy), int(sdm), int(sdd), 0, 0 ))  
@@ -441,32 +451,32 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
             category = parameters['category'] 
             
         ##### EXECUTE QUERY #####
-        
-        if parameters['f'] == '':
-            query = Eq('title', titleManaged)
-        elif parameters['f'] == 'title_description': 
-            query = Eq('description', titleManaged) | Eq('title', titleManaged)
-        elif parameters['f'] == 'roles':
-            query = Contains('rolesVals', title)   
-        elif parameters['f'] == 'persons':
-            query = Contains('persons', title)  
-        elif parameters['f'] == 'all':
-            query = Eq('description', titleManaged) | Eq('title', titleManaged) | Contains('persons', title) | Contains('rolesVals', title)
+
+        if parameters['p'] != '':
+            if parameters['f'] == '':
+                query = self.addQuery(query,Eq('title', titleManaged))
+            elif parameters['f'] == 'title_description': 
+                query = self.addQuery(query,Eq('description', titleManaged) | Eq('title', titleManaged))
+                
+        if parameters['f'] == 'roles':
+            query = self.addQuery(query,Contains('rolesVals', title))   
+        if parameters['f'] == 'persons':
+            query = self.addQuery(query,Contains('persons', title))
+        if parameters['f'] == 'all':
+            query = self.addQuery(query,Eq('description', titleManaged) | Eq('title', titleManaged) | Contains('persons', title) | Contains('rolesVals', title))
         if category != '':
-            query = query & Any('category', category) 
+            query = self.addQuery(query,Any('category', category))
         if collections != '':
-            query = query & Any('collection', collections)        
+            query = self.addQuery(query,Any('collection', collections))
         if keywords != []:
-            query = query & Any('keywords', keywords)
+            query = self.addQuery(query,Any('keywords', keywords))
 
         if startDate:                    
-            query = query & InRange('startDate',startDate, endDate)  
+            query = self.addQuery(query,InRange('startDate',startDate, endDate))
         # Ictp specific:
         if searchSMR:
             query = Any('keywords', keywords)    
 
-        
-        
         
         numdocs, results = catalog.query(query, sort_index=sortField, reverse=sortReverse, limit=self._pagination) 
       
