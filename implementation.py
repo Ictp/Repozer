@@ -477,7 +477,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         if searchSMR:
             query = Any('keywords', keywords)    
 
-        if not(title and startDate and endDate and category and keywords):
+        if not(title or startDate or endDate or category or keywords):
             return (0, [])
             
         numdocs, results = catalog.query(query, sort_index=sortField, reverse=sortReverse, limit=self._pagination) 
