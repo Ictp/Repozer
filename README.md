@@ -82,6 +82,7 @@ With Repozer > 0.9.2 Materials are now indexable!!! You will be able to search f
 
 - INSTALL Poppler and OpenOffice/LibreOffice, with headless pkg:
     - - yum install poppler
+    - - yum install poppler-utils
     - - yum install libreoffice
     - - yum install libreoffice-headless 
     
