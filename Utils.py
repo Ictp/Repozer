@@ -16,7 +16,7 @@ def getRolesValues(obj):
     # convert roles to list of values only
     vals = []
     if hasattr(obj,'_roles'):
-        sroles = str(obj._roles).replace('false','False').replace('true','True')
+        sroles = str(obj._roles).replace('false','False').replace('true','True').replace("\n"," ").replace("\r","")
         if sroles != '[]':
             lroles = eval(sroles)
             vals = []
