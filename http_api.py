@@ -77,13 +77,21 @@ class SearchFetcher(IteratedDataFetcher):
         if params._start_date:
             query = InRange('startDate',startDate_ts, endDate_ts)
 
-        if params._today:
-            td = params._today.split('/')
+        print "QUI",params._today
+        if params._today != None:
+            if params._today == '':
+                td = time.strftime("%Y/%m/%d").split('/')
+            else:
+                td = params._today.split('/')
             today_ts = timezone(localTimezone).localize(datetime(int(td[0]), int(td[1]), int(td[2]), 23, 59))
             query = Le('startDate',today_ts) & Ge('endDate',today_ts) 
 
-        if params._todaybeyond:
-            td = params._todaybeyond.split('/')
+        if params._todaybeyond != None:
+            if params._today == '':
+                td = time.strftime("%Y/%m/%d").split('/')
+            else:
+                td = params._todaybeyond.split('/')
+            
             today_ts = timezone(localTimezone).localize(datetime(int(td[0]), int(td[1]), int(td[2]), 23, 59))
             query = Le('startDate',today_ts) & Ge('endDate',today_ts) | Ge('startDate',today_ts)          
         
