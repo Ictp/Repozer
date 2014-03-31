@@ -87,7 +87,7 @@ class SearchFetcher(IteratedDataFetcher):
             query = Le('startDate',today_ts) & Ge('endDate',today_ts) 
 
         if params._todaybeyond != None:
-            if params._today == '':
+            if params._todaybeyond == '':
                 td = time.strftime("%Y/%m/%d").split('/')
             else:
                 td = params._todaybeyond.split('/')
