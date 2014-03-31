@@ -27,9 +27,9 @@ class SearchHook(HTTPAPIHook):
     RE = r'search'
     DEFAULT_DETAIL = 'events'
     MAX_RECORDS = {
-        'events': 1000,
-        'contributions': 500,
-        'subcontributions': 500,
+        'events': 100,
+        'contributions': 50,
+        'subcontributions': 50,
         'sessions': 100,
     }
 
@@ -75,9 +75,10 @@ class SearchFetcher(IteratedDataFetcher):
             endDate_ts = None
         
         if params._start_date:
-            query = InRange('startDate',startDate_ts, endDate_ts)
+            #query = InRange('startDate',startDate_ts, endDate_ts)
+            query = Not(Lt('endDate',startDate_ts) | Gt('startDate',endDate_ts)) | (InRange('startDate',startDate_ts, endDate_ts))
+            # ESCLUDO le conf gia finite e quelle future, AGGIUNGO quelle senza endDate ma con startDate nel range
 
-        print "QUI",params._today
         if params._today != None:
             if params._today == '':
                 td = time.strftime("%Y/%m/%d").split('/')
