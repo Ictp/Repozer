@@ -55,7 +55,9 @@ Otherwise, you will have to change your source files in
 ### STEP 2: Configure and create Catalog
 
 - Start Indico    
-- Enter Admin web interface, Plugins
+- Enter Admin web interface, Plugins, Reload All Manually
+- If you get the "ModuleLoadException: Impossible to load indico.ext.search.repozer" error, it means that you need a symbolic link to your repozer src folder. 
+Eg: /usr/lib/python2.6/site-packages/indico-1.2-py2.6.egg/indico/ext/search/$ ln -s /opt/indico/src/indico/ext/search/repozer repozer 
 - Enable Search plugin, Repozer, set default Sea = Repozer and Save Settings
 - Via shell, go to "<Indico path>/src/indico/ext/search/repozer/manage" and type:
 
