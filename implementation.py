@@ -46,6 +46,9 @@ from pytz import timezone
 import MaKaC.common.info as info
 import Utils as ut
 
+# Ictp: without this, apache wont recognize repozer export :(
+import indico.ext.search.repozer.http_api
+
 SEA = SEATranslator("repozer")
 
 class SearchResultRepozer(object):    
