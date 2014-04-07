@@ -546,6 +546,8 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
             for keyword in conf.getKeywords().split('\n'):
                 if not(keyword in keywords) and not(keyword.startswith('smr')) and not(keyword.startswith('expparts')) and not(keyword.startswith('siscode')) and keyword != '':
                     keywords.append(keyword)
+                    
+        # To get a faster response, comment the above lines and use a static keywords definitions.
         keywords.sort()
         
         params['categories'] = categories
