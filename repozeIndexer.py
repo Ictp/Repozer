@@ -196,7 +196,10 @@ class RepozeCatalog():
         robj._get_startDate = nd
         robj._get_endDate = nd 
         robj._get_modificationDate = nd        
-        catalog.index_doc(doc_id, robj)         
+        try:   
+            catalog.index_doc(doc_id, robj)         
+        except:
+            print "Error indexing material FID: ",fid    
         return   
                                 
     def _indexMat(self, mat):
