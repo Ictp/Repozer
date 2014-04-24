@@ -67,6 +67,8 @@ class SearchFetcher(IteratedDataFetcher):
         catalog = RepozeCatalog().catalog        
         localTimezone = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()        
         
+        # Just return Conference objs
+        query = Eq('collection', 'Conference')
                         
         if params._start_date:
             sdate = params._start_date.split('/')
@@ -82,9 +84,9 @@ class SearchFetcher(IteratedDataFetcher):
             # ESCLUDO le conf gia finite e quelle future, AGGIUNGO quelle senza endDate ma con startDate nel range
             if endDate_ts:
                 # this is a VERY TIME CONSUMING query
-                query = Not(Lt('endDate',startDate_ts) | Gt('startDate',endDate_ts)) | (InRange('startDate',startDate_ts, endDate_ts))
+                query = query & Not( Or(Lt('endDate',startDate_ts), Gt('startDate',endDate_ts)) )
             else:
-                query = Ge('endDate',startDate_ts)
+                query = query & Ge('endDate',startDate_ts)
 
         if params._today != None:
             if params._today == '':
@@ -92,7 +94,7 @@ class SearchFetcher(IteratedDataFetcher):
             else:
                 td = params._today.split('/')
             today_ts = timezone(localTimezone).localize(datetime(int(td[0]), int(td[1]), int(td[2]), 23, 59))
-            query = Le('startDate',today_ts) & Ge('endDate',today_ts) 
+            query = query & Le('startDate',today_ts) & Ge('endDate',today_ts) 
 
         if params._todaybeyond != None:
             if params._todaybeyond == '':
@@ -101,7 +103,7 @@ class SearchFetcher(IteratedDataFetcher):
                 td = params._todaybeyond.split('/')
             
             today_ts = timezone(localTimezone).localize(datetime(int(td[0]), int(td[1]), int(td[2]), 23, 59))
-            query = Le('startDate',today_ts) & Ge('endDate',today_ts) | Ge('startDate',today_ts)          
+            query = query & Le('startDate',today_ts) & Ge('endDate',today_ts) | Ge('startDate',today_ts)          
         
         
         
@@ -120,8 +122,7 @@ class SearchFetcher(IteratedDataFetcher):
         
         
         
-        # Just return Conference objs
-        query = query & Eq('collection', 'Conference')
+        
 
                
         #print "QUERY STARTED",str(datetime.now())  
