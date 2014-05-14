@@ -39,3 +39,6 @@ globalOptions = [
 
 # By default Material indexing is disabled
 typesToIndex = ['Conference','Contribution']
+#typesToIndex = ['Conference']
+
+availableCatalogs = ['rc_Event','rc_Contribution','rc_Material']
