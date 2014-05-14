@@ -400,8 +400,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
 
     def _fetchResultsFromServer(self, parameters):
 
-        rc = RepozeCatalog()
-        catalog = rc.catalog
+
         
         collections = 'Conference'
         title = ''
@@ -482,6 +481,15 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
 
         if not(title or startDate or endDate or category or keywords):
             return (0, [])
+
+        rc = RepozeCatalog()
+        if collections == 'Material':
+            rc = RepozeCatalog('rc_Material')
+        if collections == 'Contribution':
+            rc = RepozeCatalog('rc_Contribution')
+
+        catalog = rc.catalog
+
             
         numdocs, results = catalog.query(query, sort_index=sortField, reverse=sortReverse, limit=self._pagination) 
       
