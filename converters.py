@@ -81,7 +81,7 @@ class jodconverter2txt(commonConverter):
     def __init__(self):
         self.output_encoding = 'UTF-8'    
         self.binary = "java"
-        self.binaryArgs = "-jar jodconverter/lib/jodconverter-cli-2.2.2.jar"
+        self.binaryArgs = "-jar "+os.path.dirname(os.path.realpath(__file__))+"/manage/jodconverter/lib/jodconverter-cli-2.2.2.jar"
         self.av_ext_txt = ['doc','docx','odt','rtf','wpd','txt','html',] 
         self.av_ext_html = ['xlsx','ppt','pptx','xls','ods','odp','sxc','sxw','csv','sxi']
         self.av_ext = self.av_ext_txt + self.av_ext_html
