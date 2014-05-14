@@ -18,7 +18,6 @@ import time
 from pytz import timezone
 import MaKaC.common.info as info
 from MaKaC.plugins.base import PluginsHolder
-from MaKaC.common.logger import Logger
 
 globalHTTPAPIHooks = ['SearchHook']
 
@@ -36,8 +35,7 @@ class SearchHook(HTTPAPIHook):
 
     def _getParams(self):
         super(SearchHook, self)._getParams()
-#        self._start_date = get_query_parameter(self._queryParams, ['start_date'], '1970/01/01')
-        self._start_date = get_query_parameter(self._queryParams, ['start_date'], None)
+        self._start_date = get_query_parameter(self._queryParams, ['start_date'], '1970/01/01')
         self._end_date = get_query_parameter(self._queryParams, ['end_date'], None)
         self._today = get_query_parameter(self._queryParams, ['today'], None)
         self._todaybeyond = get_query_parameter(self._queryParams, ['todaybeyond'], None)
@@ -63,13 +61,11 @@ class SearchFetcher(IteratedDataFetcher):
     
         
     def searchRepoze(self, params):
-    
-        catalog = RepozeCatalog().catalog        
-        localTimezone = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()        
+        #catalog = RepozeCatalog('repozercatalog_conference').catalog
+        catalog = RepozeCatalog().catalog
         
-        # Just return Conference objs
-        query = Eq('collection', 'Conference')
-                        
+        localTimezone = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+        
         if params._start_date:
             sdate = params._start_date.split('/')
             startDate_ts = timezone(localTimezone).localize(datetime(int(sdate[0]), int(sdate[1]), int(sdate[2]), 0, 0))
@@ -81,12 +77,8 @@ class SearchFetcher(IteratedDataFetcher):
         
         if params._start_date:
             #query = InRange('startDate',startDate_ts, endDate_ts)
+            query = Not(Lt('endDate',startDate_ts) | Gt('startDate',endDate_ts)) | (InRange('startDate',startDate_ts, endDate_ts))
             # ESCLUDO le conf gia finite e quelle future, AGGIUNGO quelle senza endDate ma con startDate nel range
-            if endDate_ts:
-                # this is a VERY TIME CONSUMING query
-                query = query & Not( Or(Lt('endDate',startDate_ts), Gt('startDate',endDate_ts)) )
-            else:
-                query = query & Ge('endDate',startDate_ts)
 
         if params._today != None:
             if params._today == '':
@@ -94,7 +86,7 @@ class SearchFetcher(IteratedDataFetcher):
             else:
                 td = params._today.split('/')
             today_ts = timezone(localTimezone).localize(datetime(int(td[0]), int(td[1]), int(td[2]), 23, 59))
-            query = query & Le('startDate',today_ts) & Ge('endDate',today_ts) 
+            query = Le('startDate',today_ts) & Ge('endDate',today_ts) 
 
         if params._todaybeyond != None:
             if params._todaybeyond == '':
@@ -103,10 +95,7 @@ class SearchFetcher(IteratedDataFetcher):
                 td = params._todaybeyond.split('/')
             
             today_ts = timezone(localTimezone).localize(datetime(int(td[0]), int(td[1]), int(td[2]), 23, 59))
-            query = query & Le('startDate',today_ts) & Ge('endDate',today_ts) | Ge('startDate',today_ts)          
-        
-        
-        
+            query = Le('startDate',today_ts) & Ge('endDate',today_ts) | Ge('startDate',today_ts)          
         
         if params._keywords:
             kw = params._keywords.split(',')
@@ -120,23 +109,22 @@ class SearchFetcher(IteratedDataFetcher):
             kw = params._category.split(',')
             query = query & Any('category', kw)
         
-        
-        
-        
-
+        # Just return Conference objs
+        query = query & Eq('collection', 'Conference')
                
-        #print "QUERY STARTED",str(datetime.now())  
-        
+               
+        print "QUERY STARTED" 
+
         if params._limitQuery:
             numdocs, results = catalog.query(query, limit=params._limitQuery)
         else:
             numdocs, results = catalog.query(query)
-        
-        #print "QUERY FINISHED, NOW REMAPPING",str(datetime.now())
-        
-        
-           
-        results = [catalog.document_map.address_for_docid(result) for result in results]             
+
+        print "QUERY ENDED"    
+
+        results = [catalog.document_map.address_for_docid(result) for result in results]     
+
+        print "RESULTS MAPPED"
         
         res = []
         ch = ConferenceHolder()        
@@ -147,6 +135,8 @@ class SearchFetcher(IteratedDataFetcher):
                 res.append(event)
             except:
                 pass
+        
+        print "RETURNING"
         
         return self._process(res)
         
