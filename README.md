@@ -68,6 +68,7 @@ Eg: /usr/lib/python2.6/site-packages/indico-1.2-py2.6.egg/indico/ext/search/$ ln
 
 this will create the repozecatalog inside your Data.fs (you should see percentage numbers)
 - It could take a long time. At the end it will pack your DB.
+- For better performances, we use 3 catalogs: for Conferences (rc_Event), Contributions (rc_Contribution) and Materials (rc_Material)
 
 
 **Now your search engine is up-n-running!**
@@ -116,7 +117,7 @@ So, last suggested STEP:
     0 2 * * * /usr/bin/python /opt/indico/src/indico/ext/search/repozer/manage/updateMaterials.py 
 ```
 
-Search also inside Materials WORKS now with different charsets!!!
+Search also inside Materials WORKS with different charsets.
 
 
 
