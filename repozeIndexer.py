@@ -23,7 +23,7 @@ from repoze.catalog.indexes.field import CatalogFieldIndex
 from repoze.catalog.indexes.text import CatalogTextIndex
 from repoze.catalog.indexes.keyword import CatalogKeywordIndex
 from repoze.catalog.document import DocumentMap
-from indico.ext.search.repozer.options import typesToIndex
+from indico.ext.search.repozer.options import typesToIndex, availableCatalogs
 from indico.ext.search.repozer.converters import *
 from repoze.catalog.query import *
 
@@ -68,17 +68,28 @@ class RepozerMaterial():
     def getDescription(self):
         return self.description    
         
-    
+
 
 class RepozeCatalog():
 
-    def __init__(self):
+    def __init__(self, catalogName='rc_Event'):
         self.catalog = {}
-        self.ch = ConferenceHolder()
         self.db = db.DBMgr.getInstance().getDBConnection()
-        if 'repozecatalog' not in self.db.root():
+        self.ch = ConferenceHolder()
+
+        # init all standard catalogs
+        for cat in availableCatalogs:
+            if cat not in self.db.root():
+                self.catalogName = cat
+                self.init_catalog()        
+        
+        self.catalogName = catalogName
+
+        # init customized catalog
+        if self.catalogName not in availableCatalogs and self.catalogName not in self.db.root():
             self.init_catalog()
-        self.catalog = self.db.root()['repozecatalog']
+            
+        self.catalog = self.db.root()[self.catalogName]
 
     
     def init_catalog(self):
@@ -103,8 +114,9 @@ class RepozeCatalog():
         # I define as Text because I would permit searched for part of names
         catalog['rolesVals'] = CatalogTextIndex('_get_roles')
         catalog['persons'] = CatalogTextIndex('_get_persons')
-        self.db.root()['repozecatalog'] = catalog
-        self.catalog = self.db.root()['repozecatalog'] 
+
+        self.db.root()[self.catalogName] = catalog
+        self.catalog = self.db.root()[self.catalogName] 
         # commit the indexes
         transaction.commit()
 
@@ -196,13 +208,11 @@ class RepozeCatalog():
         robj._get_startDate = nd
         robj._get_endDate = nd 
         robj._get_modificationDate = nd        
-        try:   
-            catalog.index_doc(doc_id, robj)         
-        except:
-            print "Error indexing material FID: ",fid    
+        catalog.index_doc(doc_id, robj)         
         return   
                                 
     def _indexMat(self, mat):
+        catalog = self.db.root()['rc_Material']
         for res in mat.getResourceList():
             if not(res.isProtected()):
                 try:
@@ -220,14 +230,14 @@ class RepozeCatalog():
                     content = PDFc.text
                     res._content = content
                     print ".... indexing Material ",fpath, "___content=",content[:50]
-                    self.indexMaterial(res)
+                    self.indexMaterial(res, catalog)
                 if ftype in jod.av_ext:
                     jod.convert(fpath, ftype)
                     content = jod.text
                     res._content = content
                     #print "--------path=",fpath,"___type=",ftype, "___content=",content[:100]
                     print ".... indexing Material ",fpath, "___content=",content[:50]
-                    self.indexMaterial(res)
+                    self.indexMaterial(res, catalog)
                 PDFc = None
                 jod = None
         return
@@ -238,14 +248,16 @@ class RepozeCatalog():
         confId, sessionId, talkId, materialId = fid.split("|")
         conf = self.ch.getById(confId)        
         if 'Conference' in typesToIndex:
-            self.indexConference(conf)
+            catalog = self.db.root()['rc_Event']
+            self.indexConference(conf, catalog)
             if idxMaterial:            
                 for mat in conf.getAllMaterialList(): # Index Material inside Conference
                     self._indexMat(mat)
 
         if 'Contribution' in typesToIndex:
             for talk in conf.getContributionList():
-                self.indexContribution(talk)
+                catalog = self.db.root()['rc_Contribution']
+                self.indexContribution(talk, catalog)
                 if idxMaterial: 
                     for mat in talk.getAllMaterialList(): # Index Material inside Contributions
                         self._indexMat(mat)
@@ -263,9 +275,10 @@ class RepozeCatalog():
             pass
         if conf:    
             # Unindex ALL objects that are linked to that fid
-            (hits, res) = self.catalog.query(Eq('fid',confId+'|*'))
-            for doc_id in res:
-                self.catalog.unindex_doc(doc_id)
+            for cat in [self.db.root()['rc_Event'], self.db.root()['rc_Contribution'],self.db.root()['rc_Material']]:
+                (hits, res) = cat.query(Eq('fid',confId+'|*'))
+                for doc_id in res:
+                    cat.unindex_doc(doc_id)
         transaction.commit() 
 
         
