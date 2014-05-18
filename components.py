@@ -69,7 +69,7 @@ if 'ConferenceRolesModification' in defclasses:
                 rc = RepozeCatalog()
                 rc.reindex(self._target)
                 rc.closeConnection()
-        self._target.setRoles(self._value)
+            self._target.setRoles(self._value)
     conference.methodMap["main.changeRoles"] = ConferenceRolesModificationRepozer
 
 
