@@ -69,6 +69,7 @@ if 'ConferenceRolesModification' in defclasses:
                 rc = RepozeCatalog()
                 rc.reindex(self._target)
                 rc.closeConnection()
+        self._target.setRoles(self._value)
     conference.methodMap["main.changeRoles"] = ConferenceRolesModificationRepozer
 
 
@@ -88,7 +89,7 @@ class ConferenceKeywordsModificationRepozer( conference.ConferenceKeywordsModifi
             rc = RepozeCatalog()
             rc.reindex(self._target)
             rc.closeConnection()        
-            
+        self._target.setKeywords(self._value)    
 conference.methodMap["main.changeKeywords"] = ConferenceKeywordsModificationRepozer        
 
 
