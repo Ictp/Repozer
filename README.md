@@ -35,7 +35,7 @@ Otherwise, you will have to change your source files in
 
 
 
-- Go to "<Indico path>/src/indico/ext/search/" and do:
+- Go to "<Indico path>/src/indico/ext/search/" and clone the repo (... or you can clone it wherever you want, then put a sym link to that path):
 
 ```
     git clone https://github.com/Ictp/Repozer.git repozer
