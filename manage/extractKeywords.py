@@ -55,38 +55,10 @@ def updateCatalog():
             for keyword in keyw:
                 if not(keyword in results) and not(keyword.startswith('smr')) and not(keyword.startswith('expparts')) and not(keyword.startswith('siscode')) and keyword != '':
                     results.append(keyword)
-            
-    print results 
-        
-        
-        #print "confId=",confId
-        # select Conference in AGENDA:
-        #if confId == 'a13297':
-        #    print "cat=",conf._get_categoryList   
-        
-        #if '2l133' in conf._get_categoryList:        
-        #    print "cat=",conf._get_categoryList
-        
-        #cc.execute("set character set utf8")
-        #cc.execute("select * from AGENDA where id='%s'" % confId)
-        #confAgenda = cc.fetchone()
-        #while confAgenda != None:
-        #if confAgenda != None:
-            #confAgenda = cc.fetchone()
-        #    print confAgenda
-        #    confAgenda = cc.fetchone()
-
-    #cc.execute("set character set utf8")
-    #cc.execute("select * from AGENDA where fid in ('%s') and id>='' order by id"%strlistcat)
-    #s = cc.fetchone()    
-    #while s!=None:
-    #    s = cs.fetchone() # next
     
-                    
-    #transaction.commit()                       
-    # Pack it when finished
-    #print "Packing...."
-    #db.DBMgr.getInstance().pack()
+    results.sort()        
+    print results 
+
     print "Done."
 
 if __name__ == '__main__':  

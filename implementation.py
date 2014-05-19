@@ -49,6 +49,8 @@ import Utils as ut
 # Ictp: without this, apache wont recognize repozer export :(
 import indico.ext.search.repozer.http_api
 
+from indico.ext.search.repozer.options import availableKeywords as keywords
+
 SEA = SEATranslator("repozer")
 
 class SearchResultRepozer(object):    
@@ -549,14 +551,14 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
             if catparent and catparent.getCategory().getId() == '0':
                 categories[cat.getId()] = cat.name
 
-        keywords = []
-        for conf in conference.ConferenceHolder().getValuesToList():
-            for keyword in conf.getKeywords().split('\n'):
-                if not(keyword in keywords) and not(keyword.startswith('smr')) and not(keyword.startswith('expparts')) and not(keyword.startswith('siscode')) and keyword != '':
-                    keywords.append(keyword)
+        #keywords = []
+#         for conf in conference.ConferenceHolder().getValuesToList():
+#             for keyword in conf.getKeywords().split('\n'):
+#                 if not(keyword in keywords) and not(keyword.startswith('smr')) and not(keyword.startswith('expparts')) and not(keyword.startswith('siscode')) and keyword != '':
+#                     keywords.append(keyword)
                     
         # To get a faster response, comment the above lines and use a static keywords definitions.
-        keywords.sort()
+        #keywords.sort()
         
         params['categories'] = categories
         params['avakeywords'] = keywords

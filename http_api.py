@@ -113,18 +113,18 @@ class SearchFetcher(IteratedDataFetcher):
         query = query & Eq('collection', 'Conference')
                
                
-        print "QUERY STARTED" 
+        #print "QUERY STARTED" 
 
         if params._limitQuery:
             numdocs, results = catalog.query(query, limit=params._limitQuery)
         else:
             numdocs, results = catalog.query(query)
 
-        print "QUERY ENDED"    
+        #print "QUERY ENDED"    
 
         results = [catalog.document_map.address_for_docid(result) for result in results]     
 
-        print "RESULTS MAPPED"
+        #print "RESULTS MAPPED"
         
         res = []
         ch = ConferenceHolder()        
@@ -136,7 +136,7 @@ class SearchFetcher(IteratedDataFetcher):
             except:
                 pass
         
-        print "RETURNING"
+        #print "RETURNING"
         
         return self._process(res)
         
