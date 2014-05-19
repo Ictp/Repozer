@@ -74,9 +74,15 @@ def getFid(obj):
 def getCatFid(obj):  
     catList = []
     catowner = obj.getOwner()
-    catId = obj.getOwner().getId()
+    try:
+        catId = obj.getOwner().getId()
+    except:
+        catId = 0
     catList.append(catId)
-    catowner = catowner.getOwner()
+    try:
+        catowner = catowner.getOwner()
+    except:
+        return []
     while catowner:
         catId += "|"+catowner.getId()
         if catowner.name != 'Home':

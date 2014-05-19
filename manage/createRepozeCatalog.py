@@ -33,7 +33,7 @@ from datetime import datetime
 # CHANGE HERE if you want to index Materials
 # BEWARE: This will increase your Data.fs
 ############################################
-indexMaterial = False
+indexMaterial = True
 
 
 

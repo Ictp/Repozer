@@ -23,7 +23,7 @@ from repoze.catalog.indexes.field import CatalogFieldIndex
 from repoze.catalog.indexes.text import CatalogTextIndex
 from repoze.catalog.indexes.keyword import CatalogKeywordIndex
 from repoze.catalog.document import DocumentMap
-from indico.ext.search.repozer.options import typesToIndex, availableCatalogs
+from indico.ext.search.repozer.options import typesToIndex, confCatalog, contribCatalog, matCatalog
 from indico.ext.search.repozer.converters import *
 from repoze.catalog.query import *
 
@@ -72,13 +72,13 @@ class RepozerMaterial():
 
 class RepozeCatalog():
 
-    def __init__(self, catalogName='rc_Event'):
+    def __init__(self, catalogName=confCatalog):
         self.catalog = {}
         self.db = db.DBMgr.getInstance().getDBConnection()
         self.ch = ConferenceHolder()
 
         # init all standard catalogs
-        for cat in availableCatalogs:
+        for cat in [confCatalog,contribCatalog,matCatalog]:
             if cat not in self.db.root():
                 self.catalogName = cat
                 self.init_catalog()        
@@ -86,7 +86,8 @@ class RepozeCatalog():
         self.catalogName = catalogName
 
         # init customized catalog
-        if self.catalogName not in availableCatalogs and self.catalogName not in self.db.root():
+        
+        if self.catalogName not in [confCatalog,contribCatalog,matCatalog] and self.catalogName not in self.db.root():
             self.init_catalog()
             
         self.catalog = self.db.root()[self.catalogName]
@@ -122,7 +123,7 @@ class RepozeCatalog():
 
         
     def indexConference(self, obj, catalog=None):
-        if not(obj.hasAnyProtection()):
+        if not(obj.hasAnyProtection()):        
             if not catalog: catalog = self.catalog
             fid = ut.getFid(obj)
             doc_id = catalog.document_map.new_docid()
@@ -136,8 +137,8 @@ class RepozeCatalog():
             obj._get_categoryList = ut.getCatFid(obj)
             if hasattr(obj, '_keywords') and len(obj._keywords)>0: 
                  obj._get_keywordsList = obj.getKeywords().split('\n')
+                 
             obj._get_roles = ut.getRolesValues(obj)    
-
             obj._get_persons = ''
             if obj.getChairList(): 
                 obj._get_persons = ut.getTextFromAvatar(obj.getChairList())
@@ -212,7 +213,7 @@ class RepozeCatalog():
         return   
                                 
     def _indexMat(self, mat):
-        catalog = self.db.root()['rc_Material']
+        catalog = self.db.root()[matCatalog]
         for res in mat.getResourceList():
             if not(res.isProtected()):
                 try:
@@ -248,7 +249,7 @@ class RepozeCatalog():
         confId, sessionId, talkId, materialId = fid.split("|")
         conf = self.ch.getById(confId)        
         if 'Conference' in typesToIndex:
-            catalog = self.db.root()['rc_Event']
+            catalog = self.db.root()[confCatalog]
             self.indexConference(conf, catalog)
             if idxMaterial:            
                 for mat in conf.getAllMaterialList(): # Index Material inside Conference
@@ -256,7 +257,7 @@ class RepozeCatalog():
 
         if 'Contribution' in typesToIndex:
             for talk in conf.getContributionList():
-                catalog = self.db.root()['rc_Contribution']
+                catalog = self.db.root()[contribCatalog]
                 self.indexContribution(talk, catalog)
                 if idxMaterial: 
                     for mat in talk.getAllMaterialList(): # Index Material inside Contributions
@@ -264,6 +265,43 @@ class RepozeCatalog():
                              
         transaction.commit() 
 
+    
+    def indexObject(self, obj):
+        fid = ut.getFid(obj)
+        confId, sessionId, talkId, materialId = fid.split("|") 
+        #conf = self.ch.getById(confId)   
+        cname = obj.__class__.__name__
+        if cname == 'Conference' and cname in typesToIndex:
+            catalog = self.db.root()[confCatalog]
+            self.indexConference(obj)
+
+        if cname == 'Contribution' and cname in typesToIndex:
+            catalog = self.db.root()[contribCatalog]
+            self.indexContribution(obj, catalog)
+        
+    
+    def unindexObject(self, obj):
+        fid = ut.getFid(obj)
+        confId, sessionId, talkId, materialId = fid.split("|") 
+        conf = None
+        cname = obj.__class__.__name__
+        if cname == 'Conference':
+            useCatalog = confCatalog
+            print "FID conf=",fid            
+            useFid = fid
+        if cname == 'Contribution':
+            useCatalog = contribCatalog
+            print "FID contrib=",fid
+            useFid = fid
+        
+        
+        cat = self.db.root()[useCatalog]  
+        if useFid != '|||':  
+            (hits, res) = cat.query(Eq('fid',useFid))
+            for doc_id in res:
+                cat.unindex_doc(doc_id)
+        
+            
         
     def unindex(self, obj):          
         fid = ut.getFid(obj)
@@ -275,7 +313,7 @@ class RepozeCatalog():
             pass
         if conf:    
             # Unindex ALL objects that are linked to that fid
-            for cat in [self.db.root()['rc_Event'], self.db.root()['rc_Contribution'],self.db.root()['rc_Material']]:
+            for cat in [self.db.root()[confCatalog], self.db.root()[contribCatalog],self.db.root()[matCatalog]]:
                 (hits, res) = cat.query(Eq('fid',confId+'|*'))
                 for doc_id in res:
                     cat.unindex_doc(doc_id)

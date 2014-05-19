@@ -50,6 +50,7 @@ import Utils as ut
 import indico.ext.search.repozer.http_api
 
 from indico.ext.search.repozer.options import availableKeywords as keywords
+from indico.ext.search.repozer.options import confCatalog, contribCatalog, matCatalog
 
 SEA = SEATranslator("repozer")
 
@@ -486,9 +487,9 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
 
         rc = RepozeCatalog()
         if collections == 'Material':
-            rc = RepozeCatalog('rc_Material')
+            rc = RepozeCatalog(matCatalog)
         if collections == 'Contribution':
-            rc = RepozeCatalog('rc_Contribution')
+            rc = RepozeCatalog(contribCatalog)
 
         catalog = rc.catalog
 
@@ -497,6 +498,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
       
         # Convert doc_ids to fid
         results = [catalog.document_map.address_for_docid(result) for result in results]                  
+        
         return (numdocs, results)
 
 
