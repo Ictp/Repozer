@@ -41,16 +41,19 @@ from zope.interface import implements
 
 import MaKaC.services.implementation.conference as conference
 
-from indico.ext.search.repozer.options import typesToIndex
 import hashlib, pickle
 
 
 
 def toIndex(obj):
     plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
-    liveUpdate = plugin.getOptions()["liveUpdate"].getValue()
-    return liveUpdate and type(obj).__name__ in typesToIndex and not(obj.hasAnyProtection())
-
+    if type(obj).__name__ == 'Conference':
+        return plugin.getOptions()["indexConference"].getValue()
+    if type(obj).__name__ == 'Contribution':
+        return plugin.getOptions()["indexContribution"].getValue()
+    if type(obj).__name__ == 'LocalFile':
+        return plugin.getOptions()["indexMaterial"].getValue()
+    return False
 
 
 # This is just until ROLES will be integrated in Indico with hook on event listener
@@ -64,18 +67,12 @@ if 'ConferenceRolesModification' in defclasses:
         """
         
         def _handleSet(self):
-            print "--------------> _handleSet - ConferenceRolesModification"
-            print "HANDLE=",self._target
-            print "toindex=",toIndex(self._target)
             conference.ConferenceRolesModification._handleSet(self)
-            if toIndex(self._target):
-                
+            if toIndex(self._target):                
                 rc = RepozeCatalog()
                 rc.unindexObject(self._target)
                 rc.indexObject(self._target)
-                #rc.reindex(self._target)
                 rc.closeConnection()
-            #self._target.setRoles(self._value)
     conference.methodMap["main.changeRoles"] = ConferenceRolesModificationRepozer
 
 
@@ -88,15 +85,12 @@ class ConferenceKeywordsModificationRepozer( conference.ConferenceKeywordsModifi
     """
         
     def _handleSet(self):
-        print "--------------> _handleSet - ConferenceKeywordsModificationRepozer"
         conference.ConferenceKeywordsModification._handleSet(self)
         if toIndex(self._target):            
             rc = RepozeCatalog()
-            #rc.reindex(self._target)
             rc.unindexObject(self._target)
             rc.indexObject(self._target)            
             rc.closeConnection()        
-        #self._target.setKeywords(self._value)    
 conference.methodMap["main.changeKeywords"] = ConferenceKeywordsModificationRepozer        
 
 
@@ -116,60 +110,34 @@ class ObjectChangeListener(Component):
     
 
     def created(self, obj, owner):
-        print "--------------> CREATED", obj
         pass
-#         if toIndex(obj):
-#             rc = RepozeCatalog()
-#             #obj.md5 = self.getHash(obj)
-#             rc.index(obj)
-#             rc.closeConnection()
+
 
     def moved(self, obj, fromOwner, toOwner):
-        print "--------------> MOVRED"
         pass
-#         if toIndex(obj):
-#             rc = RepozeCatalog()
-#             rc.reindex(obj)
-#             rc.closeConnection()
+
 
     def deleted(self, obj, oldOwner):
         if toIndex(obj):
             rc = RepozeCatalog()
-            #rc.unindex(obj)
             rc.unindexObject(obj)
             rc.closeConnection()        
             
     def eventTitleChanged(self, obj, oldTitle, newTitle):
         pass
-#         print "--------------> eventTitleChanged", obj
-#         if toIndex(obj):
-#             rc = RepozeCatalog()
-#             rc.unindexObject(obj)
-#             rc.indexConference(obj)            
-#             #rc.reindex(obj)
-#             rc.closeConnection()
+
             
     def infoChanged(self, obj):
-        print "--------------> INFO_CHANGED", obj
         if toIndex(obj):
-            #print "...indexing..."
             rc = RepozeCatalog()
-            # I dont want to reindex Material, it takes soo long
             rc.unindexObject(obj)
             rc.indexObject(obj)
-            
-            #rc.reindex(obj,False)
             rc.closeConnection()
 
                             
     def eventDatesChanged(cls, obj, oldStartDate, oldEndDate, newStartDate, newEndDate):
         pass
-#         if toIndex(obj):
-#             rc = RepozeCatalog()
-#             rc.unindexObject(obj)
-#             rc.indexConference(obj)            
-#             #rc.reindex(obj)
-#             rc.closeConnection()                          
+
 
 class PluginImplementationContributor(Component, Observable):
     """

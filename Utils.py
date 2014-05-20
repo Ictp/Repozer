@@ -51,15 +51,18 @@ def getFid(obj):
     fid = "|||"
     cname = type(obj).__name__
     if hasattr(obj, '__type__'): cname = obj.__type__
+
     if cname == 'Conference':
         fid = str(obj.getId()+"|||")
+
     if cname == 'Contribution':
         conf = obj.getConference()
         fid = str(conf.getId()) + "|"
         if obj.getSession():
             fid += str(obj.getSession().getId())
         fid += "|"+str(obj.getId()) + "|" 
-    if cname == 'Material':      
+
+    if cname == 'Material':  # this is for class RepozerMaterial    
         conf = obj.getConference()        
         fid = str(conf.getId()) + "|"        
         if obj.getSession():
@@ -68,6 +71,18 @@ def getFid(obj):
         if obj.getContribution():
             fid += str(obj.getContribution().getId())
         fid += "|" + str(obj.getId()) 
+
+    if cname == 'LocalFile':  
+        m = obj.getOwner()    
+        conf = m.getConference()        
+        fid = str(conf.getId()) + "|"        
+        if m.getSession():
+            fid += str(m.getSession().getId())
+        fid += "|"
+        if m.getContribution():
+            fid += str(m.getContribution().getId())
+        fid += "|" + str(m.getId()) +'/'+str(obj.getId())
+
     return fid
 
 
@@ -91,7 +106,6 @@ def getCatFid(obj):
     return catList
 
     
-
 def getTextFromAvatar(alist):
     data = []
     for s in alist:

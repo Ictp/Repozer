@@ -20,25 +20,34 @@ from MaKaC.i18n import _
 
 from indico.core.config import Config
 
+globalOptions = [
+
+    ("indexConference", {"description" : "Repozer will index Conferences",
+               "type": bool,
+               "defaultValue": True,
+               "editable": True,
+               "visible": True} ),
+
+    ("indexContribution", {"description" : "Repozer will index Contributions",
+               "type": bool,
+               "defaultValue": True,
+               "editable": True,
+               "visible": True} ),
+
+    ("indexMaterial", {"description" : "Repozer will index Materials",
+               "type": bool,
+               "defaultValue": True,
+               "editable": True,
+               "visible": True} ),
 
 # This is for external DB
-#globalOptions = [
 #    ("DBpath", {"description": "Repozer DB path",
 #                  "type": str,
 #                  "defaultValue": "/opt/indico/db/repoze_catalog.fs",
 #                  "editable": True,
 #                  "visible": True}),
-#]
-globalOptions = [
-    ("liveUpdate", {"description" : "Repozer will index contents automatically",
-               "type": bool,
-               "defaultValue": True,
-               "editable": True,
-               "visible": True} ),
-]
 
-# By default Material indexing is disabled
-typesToIndex = ['Conference','Contribution']
+]
 
 
 # if you want to use a SINGLE catalog, just use the same name

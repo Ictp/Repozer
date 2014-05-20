@@ -23,7 +23,7 @@ from repoze.catalog.indexes.field import CatalogFieldIndex
 from repoze.catalog.indexes.text import CatalogTextIndex
 from repoze.catalog.indexes.keyword import CatalogKeywordIndex
 from repoze.catalog.document import DocumentMap
-from indico.ext.search.repozer.options import typesToIndex, confCatalog, contribCatalog, matCatalog
+from indico.ext.search.repozer.options import confCatalog, contribCatalog, matCatalog
 from indico.ext.search.repozer.converters import *
 from repoze.catalog.query import *
 
@@ -39,7 +39,7 @@ class RepozerMaterial():
         self._owner = None
         self.description = None
         if obj:
-            self._owner = obj._owner
+            self._owner = obj.getOwner()
             locator = obj.getLocator()
             self.id = locator['materialId'] + '/' + locator['resId']
             self.ext = '.' + locator['fileExt']
@@ -77,6 +77,11 @@ class RepozeCatalog():
         self.db = db.DBMgr.getInstance().getDBConnection()
         self.ch = ConferenceHolder()
 
+        plugin = PluginsHolder().getPluginType('search').getPlugin("repozer")
+        self.iConf = plugin.getOptions()["indexConference"].getValue()
+        self.iContrib = plugin.getOptions()["indexContribution"].getValue()
+        self.iMat = plugin.getOptions()["indexMaterial"].getValue()
+
         # init all standard catalogs
         for cat in [confCatalog,contribCatalog,matCatalog]:
             if cat not in self.db.root():
@@ -85,8 +90,7 @@ class RepozeCatalog():
         
         self.catalogName = catalogName
 
-        # init customized catalog
-        
+        # init customized catalog        
         if self.catalogName not in [confCatalog,contribCatalog,matCatalog] and self.catalogName not in self.db.root():
             self.init_catalog()
             
@@ -124,7 +128,7 @@ class RepozeCatalog():
         
     def indexConference(self, obj, catalog=None):
         if not(obj.hasAnyProtection()):        
-            if not catalog: catalog = self.catalog
+            if not catalog: catalog = self.db.root()[confCatalog]
             fid = ut.getFid(obj)
             doc_id = catalog.document_map.new_docid()
             catalog.document_map.add(fid, doc_id) 
@@ -152,7 +156,7 @@ class RepozeCatalog():
 
     def indexContribution(self, obj, catalog=None):
         if not(obj.hasAnyProtection()):
-            if not catalog: catalog = self.catalog
+            if not catalog: catalog = self.db.root()[contribCatalog]
             doc_id = catalog.document_map.new_docid()
             fid = ut.getFid(obj)
             confId, sessionId, talkId, materialId = fid.split("|")
@@ -186,8 +190,7 @@ class RepozeCatalog():
             catalog.index_doc(doc_id, obj)
 
 
-    def indexMaterial(self, obj, catalog=None):
-        if not catalog: catalog = self.catalog
+    def _indexMat(self, obj, catalog):
         doc_id = catalog.document_map.new_docid()
         robj = RepozerMaterial(obj)
         fid = ut.getFid(robj)
@@ -212,125 +215,116 @@ class RepozeCatalog():
         catalog.index_doc(doc_id, robj)         
         return   
                                 
-    def _indexMat(self, mat):
-        catalog = self.db.root()[matCatalog]
-        for res in mat.getResourceList():
-            if not(res.isProtected()):
-                try:
-                    ftype = res.getFileType().lower()
-                    fname = res.getFileName()
-                    fpath = res.getFilePath()
-                except:
-                    ftype = None
-                content = ''
-                PDFc = pdf2txt()
-                jod = jodconverter2txt()                
-                if ftype in PDFc.av_ext: 
-                    # I do not use pyPDF because most of PDF are protected                
-                    PDFc.convert(fpath)
-                    content = PDFc.text
-                    res._content = content
-                    print ".... indexing Material ",fpath, "___content=",content[:50]
-                    self.indexMaterial(res, catalog)
-                if ftype in jod.av_ext:
-                    jod.convert(fpath, ftype)
-                    content = jod.text
-                    res._content = content
-                    #print "--------path=",fpath,"___type=",ftype, "___content=",content[:100]
-                    print ".... indexing Material ",fpath, "___content=",content[:50]
-                    self.indexMaterial(res, catalog)
-                PDFc = None
-                jod = None
+    def indexMaterial(self, res, catalog=None):
+        if not catalog: catalog = self.db.root()[matCatalog]
+        if not(res.isProtected()):
+            try:
+                ftype = res.getFileType().lower()
+                fname = res.getFileName()
+                fpath = res.getFilePath()
+            except:
+                ftype = None
+            content = ''
+            PDFc = pdf2txt()
+            jod = jodconverter2txt()                
+            if ftype in PDFc.av_ext: 
+                # I do not use pyPDF because most of PDF are protected                
+                PDFc.convert(fpath)
+                content = PDFc.text
+                res._content = content
+                print ".... indexing Material ",fpath, "___content=",content[:50]
+                self._indexMat(res, catalog)
+            if ftype in jod.av_ext:
+                jod.convert(fpath, ftype)
+                content = jod.text
+                res._content = content
+                print ".... indexing Material ",fpath, "___content=",content[:50]
+                self._indexMat(res, catalog)
+            PDFc = None
+            jod = None
         return
     
                 
-    def index(self, obj, idxMaterial=False):   
+    def fullIndex(self, obj):   
         fid = ut.getFid(obj)
         confId, sessionId, talkId, materialId = fid.split("|")
-        conf = self.ch.getById(confId)        
-        if 'Conference' in typesToIndex:
+        conf = self.ch.getById(confId) 
+
+        if self.iConf:
             catalog = self.db.root()[confCatalog]
             self.indexConference(conf, catalog)
-            if idxMaterial:            
+            if self.iMat:            
                 for mat in conf.getAllMaterialList(): # Index Material inside Conference
-                    self._indexMat(mat)
+                    for res in mat.getResourceList():
+                        self.indexMaterial(res)
 
-        if 'Contribution' in typesToIndex:
+        if self.iContrib:
             for talk in conf.getContributionList():
                 catalog = self.db.root()[contribCatalog]
                 self.indexContribution(talk, catalog)
-                if idxMaterial: 
+                if self.iMat:   
                     for mat in talk.getAllMaterialList(): # Index Material inside Contributions
-                        self._indexMat(mat)
+                        for res in mat.getResourceList():
+                            self.indexMaterial(res)
                              
         transaction.commit() 
 
     
     def indexObject(self, obj):
-        fid = ut.getFid(obj)
-        confId, sessionId, talkId, materialId = fid.split("|") 
-        #conf = self.ch.getById(confId)   
+
         cname = obj.__class__.__name__
-        if cname == 'Conference' and cname in typesToIndex:
-            catalog = self.db.root()[confCatalog]
+        if cname == 'Conference' and self.iConf:
             self.indexConference(obj)
 
-        if cname == 'Contribution' and cname in typesToIndex:
-            catalog = self.db.root()[contribCatalog]
-            self.indexContribution(obj, catalog)
+        if cname == 'Contribution' and self.iContrib:
+            self.indexContribution(obj)
+
+        if cname == 'LocalFile' and self.iMat:
+            self.indexMaterial(obj)
         
     
     def unindexObject(self, obj):
-        fid = ut.getFid(obj)
-        confId, sessionId, talkId, materialId = fid.split("|") 
+        
+        fid = '|||'
         conf = None
         cname = obj.__class__.__name__
-        if cname == 'Conference':
+        useCatalog = None
+
+        if cname == 'Conference' and self.iConf:
             useCatalog = confCatalog
             print "FID conf=",fid            
-            useFid = fid
-        if cname == 'Contribution':
-            useCatalog = contribCatalog
-            print "FID contrib=",fid
-            useFid = fid
-        
-        
-        cat = self.db.root()[useCatalog]  
-        if useFid != '|||':  
-            (hits, res) = cat.query(Eq('fid',useFid))
-            for doc_id in res:
-                cat.unindex_doc(doc_id)
-        
-            
-        
-    def unindex(self, obj):          
-        fid = ut.getFid(obj)
-        confId, sessionId, talkId, materialId = fid.split("|")  
-        conf = None
-        try:      
-            conf = self.ch.getById(confId)  
-        except:
-            pass
-        if conf:    
-            # Unindex ALL objects that are linked to that fid
-            for cat in [self.db.root()[confCatalog], self.db.root()[contribCatalog],self.db.root()[matCatalog]]:
-                (hits, res) = cat.query(Eq('fid',confId+'|*'))
-                for doc_id in res:
-                    cat.unindex_doc(doc_id)
-        transaction.commit() 
+            fid = ut.getFid(obj)
+            confId, sessionId, talkId, materialId = fid.split("|")  
+            if fid != '|||':
+                for cat in [self.db.root()[confCatalog], self.db.root()[contribCatalog],self.db.root()[matCatalog]]:
+                    (hits, res) = cat.query(Eq('fid',confId+'|*'))
+                    for doc_id in res:
+                        cat.unindex_doc(doc_id)
 
-        
-    def reindex(self, c, idxMaterial=False):
-        fid = ut.getFid(c)
-        confId, sessionId, talkId, materialId = fid.split("|")
-        # Check if conference still exist       
-        cc = None
-        # THIS CAN BE OPTIMIZED    
-        try: cc = self.ch.getById(confId)
-        except: pass            
-        if cc:
-            self.unindex(cc)
-            self.index(cc,idxMaterial)
+        if cname == 'Contribution' and self.iContrib:
+            useCatalog = contribCatalog
+            fid = ut.getFid(obj)
+            print "FID contrib=",fid
+            if fid != '|||':
+                # Remove Contrib:
+                cat = self.db.root()[contribCatalog]
+                (hits, res) = cat.query(Eq('fid',fid))
+                for doc_id in res:
+                    cat.unindex_doc(doc_id) 
+                # Remove inner Materials:
+                cat = self.db.root()[matCatalog]
+                (hits, res) = cat.query(Eq('fid',fid+'*'))
+                for doc_id in res:
+                    cat.unindex_doc(doc_id) 
+
+        if cname == 'LocalFile' and self.iMat:              
+            fid = ut.getFid(obj)
+            cat = self.db.root()[matCatalog]
+            if fid != '|||':  
+                (hits, res) = cat.query(Eq('fid',fid))
+                for doc_id in res:
+                    cat.unindex_doc(doc_id) 
+  
 
         
     def closeConnection(self):

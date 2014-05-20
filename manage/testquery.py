@@ -23,7 +23,6 @@ except: from MaKaC.common import db
 from MaKaC.conference import CategoryManager, ConferenceHolder
 from MaKaC.plugins.base import PluginsHolder
 from indico.ext.search.repozer import Utils as ut
-from indico.ext.search.repozer.options import typesToIndex
 from indico.ext.search.repozer.repozeIndexer import RepozeCatalog
 from repoze.catalog.query import *
 import transaction
