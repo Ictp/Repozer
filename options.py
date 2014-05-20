@@ -36,7 +36,7 @@ globalOptions = [
 
     ("indexMaterial", {"description" : "Repozer will index Materials",
                "type": bool,
-               "defaultValue": True,
+               "defaultValue": False,
                "editable": True,
                "visible": True} ),
 

@@ -59,7 +59,7 @@ Otherwise, you will have to change your source files in
 - If you get the "ModuleLoadException: Impossible to load indico.ext.search.repozer" error, it means that you need a symbolic link to your repozer src folder. 
 
 Eg: /usr/lib/python2.6/site-packages/indico-1.2-py2.6.egg/indico/ext/search/$ ln -s /opt/indico/src/indico/ext/search/repozer repozer 
-- Enable Search plugin, Repozer, set default Sea = Repozer and Save Settings
+- Enable Search plugin, Repozer, set default Sea = Repozer and Save Settings, ENABLE/DISABLE Indexing properties!
 - Via shell, go to "<Indico path>/src/indico/ext/search/repozer/manage" and type:
 
 ```
@@ -68,7 +68,7 @@ Eg: /usr/lib/python2.6/site-packages/indico-1.2-py2.6.egg/indico/ext/search/$ ln
 
 this will create the repozecatalog inside your Data.fs (you should see percentage numbers)
 - It could take a long time. At the end it will pack your DB.
-- For better performances, we use 3 catalogs: for Conferences (rc_Event), Contributions (rc_Contribution) and Materials (rc_Material)
+- For better performances, we use 3 catalogs: for Conferences (rc_Event), Contributions (rc_Contribution) and Materials (rc_Material). If you prefere using the same catalog for all Items take a look at options.py
 
 
 **Now your search engine is up-n-running!**
@@ -92,10 +92,24 @@ With Repozer > 0.9.2 Materials are now indexable!!! You will be able to search f
     
 - UNCOMMENT line 13 in tpls/SearchResult.tpl : to make Material visible in the 'search in' combo
 
-- EDIT manage/createRepozeCatalog.py and set:
+- Enable Material Indexing in Search PLUGIN properties (disabled by default)
+
+- Add some code to MaKaC/conference.py to notify creation/editing/deleting od Materials:
+
+@ line 11368, right after:  parent.setModificationDate()
+
 ```
-    indexMaterial = True
+            # added for Indexing
+            self._notify('infoChanged')
 ```
+
+@ line 11452, right after:          if self._owner is not None:
+
+```
+            # notifiy deleting for indexing
+            self._notify('deleted', self._owner)
+```
+
 
 - START OpenOffice/LibreOffice service: 
 
@@ -103,19 +117,7 @@ With Repozer > 0.9.2 Materials are now indexable!!! You will be able to search f
     $ soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard 
 ```
 
-- DONE! Now you can re-run createRepozeCatalog.py for indexing all your Materials!
-
-- IMPORTANT: Right now, I do not have found an hook to the add/remove/edit Material event, 
-so if you add/remove/edit Materials the Repozer Catalog wont know that! :(
-The suggested way to solve the issue is a CRONJOB that, once a day for example, checks for edited Conferences and
-re-index them. I've prepared a python script that achieve this: manage/updateMaterials.py
-So, last suggested STEP:
-
-- PUT THIS in your cronjob:
-
-```
-    0 2 * * * /usr/bin/python /opt/indico/src/indico/ext/search/repozer/manage/updateMaterials.py 
-```
+- DONE! Now you can re-run createRepozeCatalog.py for indexing all contents WITH Materials!
 
 Search also inside Materials WORKS with different charsets.
 
@@ -125,7 +127,7 @@ BEWARE!
 -------
 
 There are some things that you should notice:
-- Results pagination has been disabled and results are limited to 5000 
+- Results pagination has been disabled and results are limited
     (you can change this behaviour by yourself by looking into code)
 
 
@@ -138,7 +140,7 @@ To understand it better, just take a look at http_api.py
 E.g. you can make a call like this:
 
 ```
-http://<Indico URL>/indico/export/conference/search.xml?start_date=2013/01/01&keywords=Condensed Matter and Statistical Physics,Computational Physics in Condensed Matter
+http://<Indico URL>/export/conference/search.xml?start_date=2013/01/01&keywords=Condensed Matter and Statistical Physics,Computational Physics in Condensed Matter
 ```
 
 Usable Parameters are:
@@ -154,7 +156,7 @@ To get richer Events data, you can change default DETAILS.
 E.g.:
 
 ```
-http://<Indico URL>/indico/export/conference/search.json?detail=contributions&today=2013/04/10
+http://<Indico URL>/export/conference/search.json?detail=contributions&today=2013/04/10
 ```
 
 
