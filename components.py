@@ -104,37 +104,28 @@ class ObjectChangeListener(Component):
 
     implements(IMetadataChangeListener, IObjectLifeCycleListener)
 
-#     def getHash(self, obj):
-#         arr = [str(getattr(obj, x)).decode('utf8','ignore') for x in vars(obj).keys() if x != '_modificationDS']
-#         return ''.join(arr)
-    
-
-    def created(self, obj, owner):
-        pass
-
-
-    def moved(self, obj, fromOwner, toOwner):
-        pass
-
-
     def deleted(self, obj, oldOwner):
+        print "___DELETED CALL"
         if toIndex(obj):
             rc = RepozeCatalog()
-            rc.unindexObject(obj)
+            # Use recursion
+            rc.unindexObject(obj, True)
             rc.closeConnection()        
-            
-    def eventTitleChanged(self, obj, oldTitle, newTitle):
-        pass
-
-            
+                        
     def infoChanged(self, obj):
+        print "___INFO CHANGED"
         if toIndex(obj):
             rc = RepozeCatalog()
             rc.unindexObject(obj)
             rc.indexObject(obj)
             rc.closeConnection()
 
-                            
+    def created(self, obj, owner):
+        pass
+    def moved(self, obj, fromOwner, toOwner):
+        pass
+    def eventTitleChanged(self, obj, oldTitle, newTitle):
+        pass                            
     def eventDatesChanged(cls, obj, oldStartDate, oldEndDate, newStartDate, newEndDate):
         pass
 

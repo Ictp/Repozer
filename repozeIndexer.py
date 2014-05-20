@@ -283,47 +283,49 @@ class RepozeCatalog():
             self.indexMaterial(obj)
         
     
-    def unindexObject(self, obj):
+    def unindexObject(self, obj, recursive=False):
         
-        fid = '|||'
+        fid = ut.getFid(obj)
+        if fid == '|||': return
         conf = None
         cname = obj.__class__.__name__
         useCatalog = None
 
         if cname == 'Conference' and self.iConf:
             useCatalog = confCatalog
-            print "FID conf=",fid            
-            fid = ut.getFid(obj)
             confId, sessionId, talkId, materialId = fid.split("|")  
-            if fid != '|||':
-                for cat in [self.db.root()[confCatalog], self.db.root()[contribCatalog],self.db.root()[matCatalog]]:
+
+            cat = self.db.root()[confCatalog]
+            (hits, res) = cat.query(Eq('fid',fid))
+            for doc_id in res:
+                cat.unindex_doc(doc_id) 
+
+            if recursive:
+                # also remove inner objects
+                for cat in [self.db.root()[contribCatalog],self.db.root()[matCatalog]]:
                     (hits, res) = cat.query(Eq('fid',confId+'|*'))
                     for doc_id in res:
                         cat.unindex_doc(doc_id)
 
         if cname == 'Contribution' and self.iContrib:
             useCatalog = contribCatalog
-            fid = ut.getFid(obj)
-            print "FID contrib=",fid
-            if fid != '|||':
-                # Remove Contrib:
-                cat = self.db.root()[contribCatalog]
-                (hits, res) = cat.query(Eq('fid',fid))
-                for doc_id in res:
-                    cat.unindex_doc(doc_id) 
-                # Remove inner Materials:
-                cat = self.db.root()[matCatalog]
-                (hits, res) = cat.query(Eq('fid',fid+'*'))
-                for doc_id in res:
-                    cat.unindex_doc(doc_id) 
+            # Remove Contrib:
+            cat = self.db.root()[contribCatalog]
+            (hits, res) = cat.query(Eq('fid',fid))
+            for doc_id in res:
+                cat.unindex_doc(doc_id) 
+                if recursive:
+                    # also remove inner objects
+                    cat = self.db.root()[matCatalog]
+                    (hits, res) = cat.query(Eq('fid',fid+'*'))
+                    for doc_id in res:
+                        cat.unindex_doc(doc_id) 
 
-        if cname == 'LocalFile' and self.iMat:              
-            fid = ut.getFid(obj)
+        if cname == 'LocalFile' and self.iMat:                          
             cat = self.db.root()[matCatalog]
-            if fid != '|||':  
-                (hits, res) = cat.query(Eq('fid',fid))
-                for doc_id in res:
-                    cat.unindex_doc(doc_id) 
+            (hits, res) = cat.query(Eq('fid',fid))
+            for doc_id in res:
+                cat.unindex_doc(doc_id) 
   
 
         
