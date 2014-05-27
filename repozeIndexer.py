@@ -311,8 +311,6 @@ class RepozeCatalog():
                 for cat in [self.db.root()[contribCatalog],self.db.root()[matCatalog]]:
                     (hits, res) = cat.query(Eq('fid',confId+'|*'))
                     for doc_id in res:
-                        print "____qui___"
-
                         cat.unindex_doc(doc_id)
 
         if cname == 'Contribution' and self.iContrib:
