@@ -274,7 +274,12 @@ class RepozeCatalog():
 
         cname = obj.__class__.__name__
         if cname == 'Conference' and self.iConf:
-            self.indexConference(obj)
+            objExist = True
+            try: o = ch.getById(finalid)
+            except: objExist = False
+            # if obj has not been DELETED:
+            if objExist:
+                self.indexConference(obj)
 
         if cname == 'Contribution' and self.iContrib:
             self.indexContribution(obj)
@@ -298,6 +303,7 @@ class RepozeCatalog():
             cat = self.db.root()[confCatalog]
             (hits, res) = cat.query(Eq('fid',fid))
             for doc_id in res:
+                print "__unindex fid=",fid,"__TITLE=", obj.getTitle()
                 cat.unindex_doc(doc_id) 
 
             if recursive:
@@ -305,6 +311,8 @@ class RepozeCatalog():
                 for cat in [self.db.root()[contribCatalog],self.db.root()[matCatalog]]:
                     (hits, res) = cat.query(Eq('fid',confId+'|*'))
                     for doc_id in res:
+                        print "____qui___"
+
                         cat.unindex_doc(doc_id)
 
         if cname == 'Contribution' and self.iContrib:
