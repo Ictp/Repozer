@@ -128,6 +128,7 @@ class RepozeCatalog():
         
     def indexConference(self, obj, catalog=None):
         if not(obj.hasAnyProtection()):        
+            print "sono QUI"
             if not catalog: catalog = self.db.root()[confCatalog]
             fid = ut.getFid(obj)
             doc_id = catalog.document_map.new_docid()
@@ -140,7 +141,7 @@ class RepozeCatalog():
             obj._get_keywordsList = []     
             obj._get_categoryList = ut.getCatFid(obj)
             if hasattr(obj, '_keywords') and len(obj._keywords)>0: 
-                 obj._get_keywordsList = obj.getKeywords().split('\n')
+                obj._get_keywordsList = obj.getKeywords().replace('\r','').split('\n')
                  
             obj._get_roles = ut.getRolesValues(obj)    
             obj._get_persons = ''
@@ -275,7 +276,7 @@ class RepozeCatalog():
         cname = obj.__class__.__name__
         if cname == 'Conference' and self.iConf:
             objExist = True
-            try: o = ch.getById(finalid)
+            try: o = self.ch.getById(obj.getId())
             except: objExist = False
             # if obj has not been DELETED:
             if objExist:

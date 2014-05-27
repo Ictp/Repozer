@@ -478,6 +478,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
 
         if startDate:                    
             query = self.addQuery(query,InRange('startDate',startDate, endDate))
+
         # Ictp specific:
         if searchSMR:
             query = Any('keywords', keywords)    
@@ -495,7 +496,6 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
 
             
         numdocs, results = catalog.query(query, sort_index=sortField, reverse=sortReverse, limit=self._pagination) 
-      
         # Convert doc_ids to fid
         results = [catalog.document_map.address_for_docid(result) for result in results]                  
         
