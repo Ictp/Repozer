@@ -128,7 +128,6 @@ class RepozeCatalog():
         
     def indexConference(self, obj, catalog=None):
         if not(obj.hasAnyProtection()):        
-            print "sono QUI"
             if not catalog: catalog = self.db.root()[confCatalog]
             fid = ut.getFid(obj)
             doc_id = catalog.document_map.new_docid()
