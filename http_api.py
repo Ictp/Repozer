@@ -35,6 +35,7 @@ class SearchHook(HTTPAPIHook):
 
     def _getParams(self):
         super(SearchHook, self)._getParams()
+        self._id = get_query_parameter(self._queryParams, ['id'], None)
         self._start_date = get_query_parameter(self._queryParams, ['start_date'], '1970/01/01')
         self._end_date = get_query_parameter(self._queryParams, ['end_date'], None)
         self._today = get_query_parameter(self._queryParams, ['today'], None)
@@ -65,6 +66,11 @@ class SearchFetcher(IteratedDataFetcher):
         catalog = RepozeCatalog().catalog
         
         localTimezone = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+        
+        confId = None
+        
+        if params._id:
+            confId = params._id
         
         if params._start_date:
             sdate = params._start_date.split('/')
@@ -114,27 +120,31 @@ class SearchFetcher(IteratedDataFetcher):
                
                
         #print "QUERY STARTED" 
-
-        if params._limitQuery:
-            numdocs, results = catalog.query(query, limit=params._limitQuery)
-        else:
-            numdocs, results = catalog.query(query)
-
-        #print "QUERY ENDED"    
-
-        results = [catalog.document_map.address_for_docid(result) for result in results]     
-
-        #print "RESULTS MAPPED"
-        
         res = []
         ch = ConferenceHolder()        
-        for obj in results:
-            try:
-                confId = str(obj).split("|")[0]
-                event = ch.getById(confId)
-                res.append(event)
-            except:
-                pass
+
+        if confId:
+            event = ch.getById(confId)
+            res.append(event)
+        else:
+            if params._limitQuery:
+                numdocs, results = catalog.query(query, limit=params._limitQuery)
+            else:
+                numdocs, results = catalog.query(query)
+
+            #print "QUERY ENDED"    
+
+            results = [catalog.document_map.address_for_docid(result) for result in results]     
+
+            #print "RESULTS MAPPED"
+        
+            for obj in results:
+                try:
+                    confId = str(obj).split("|")[0]
+                    event = ch.getById(confId)
+                    res.append(event)
+                except:
+                    pass
         
         #print "RETURNING"
         
