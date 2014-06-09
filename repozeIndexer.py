@@ -331,7 +331,8 @@ class RepozeCatalog():
             cat = self.db.root()[matCatalog]
             (hits, res) = cat.query(Eq('fid',fid))
             for doc_id in res:
-                cat.unindex_doc(doc_id) 
+                cat.unindex_doc(doc_id)
+            
   
 
         

@@ -147,6 +147,7 @@ class MaterialEntryRepozer(ConferenceEntryRepozer,RepozerMaterial):
         self.ch = ConferenceHolder()
         conf = self.ch.getById(self.confId)
         self.matId, self.resId = self.materialId.split('/')
+        if not(self.resId) or self.resId == 'not assigned': self.resId = '0'
         obj = None
         if self.talkId: # Material inside Talk
             if self.sessionId: # Talk inside Session
@@ -154,11 +155,14 @@ class MaterialEntryRepozer(ConferenceEntryRepozer,RepozerMaterial):
                 obj = s.getContributionById(self.talkId)
             else: obj = conf.getContributionById(self.talkId)
         else: obj = conf
-        
+
         self.mat = obj.getMaterialById(self.matId)
-        self.res = self.mat.getResourceById(self.resId)
-        self.robj = RepozerMaterial(self.res)
-        self.ext = self.robj.ext
+        self.robj = None
+        self.ext = ''
+        if self.mat:
+            self.res = self.mat.getResourceById(self.resId)
+            self.robj = RepozerMaterial(self.res)
+            self.ext = self.robj.ext
             
     def isVisible(self, user):
         # Only PUBLIC documents are Indexed
@@ -171,7 +175,10 @@ class MaterialEntryRepozer(ConferenceEntryRepozer,RepozerMaterial):
             return None
     
     def getTitle(self):
-        return self.robj.getTitle()
+        if not(self.robj):
+            return "- NO TITLE -"
+        else:
+            return self.robj.getTitle()
     
     def getDescription(self):
         return ''

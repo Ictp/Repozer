@@ -105,12 +105,14 @@ class ObjectChangeListener(Component):
     implements(IMetadataChangeListener, IObjectLifeCycleListener)
 
     def deleted(self, obj, oldOwner):
-        print "___DELETED CALL OBJ=",obj
+        print "___DELETED CALL OBJ=",obj, oldOwner
         if toIndex(obj):
             rc = RepozeCatalog()
             # Use recursion
             rc.unindexObject(obj, True)
-            rc.closeConnection()        
+            oldOwner._notify('deleted', obj)
+            rc.closeConnection() 
+                   
                         
     def infoChanged(self, obj):
         print "___INFO CHANGED", obj
@@ -119,6 +121,7 @@ class ObjectChangeListener(Component):
             rc.unindexObject(obj)
             rc.indexObject(obj)
             rc.closeConnection()
+            
 
     def created(self, obj, owner):
         pass
