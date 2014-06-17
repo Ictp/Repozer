@@ -337,7 +337,7 @@ class RepozeCatalog():
 
         
     def closeConnection(self):
-        transaction.commit()              
+        #transaction.commit()              
         #self.factory.db.close()
         #self.manager.commit()        
         #self.manager.close() 
