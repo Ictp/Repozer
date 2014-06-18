@@ -28,6 +28,7 @@ from MaKaC.plugins.base import Observable
 # indico imports
 from indico.core.extpoint import Component
 from indico.core.extpoint.events import IObjectLifeCycleListener, IMetadataChangeListener
+from indico.core.extpoint.events import IAccessControlListener
 from indico.core.extpoint.plugins import IPluginImplementationContributor
 from indico.ext.search.repozer.implementation import RepozerSEA
 from indico.ext.search.repozer.repozeIndexer import RepozeCatalog
@@ -91,21 +92,18 @@ class ConferenceKeywordsModificationRepozer( conference.ConferenceKeywordsModifi
             rc.unindexObject(self._target)
             rc.indexObject(self._target)            
             rc.closeConnection()        
-conference.methodMap["main.changeKeywords"] = ConferenceKeywordsModificationRepozer        
-
-
-
+conference.methodMap["main.changeKeywords"] = ConferenceKeywordsModificationRepozer            
 
 class ObjectChangeListener(Component):
     """
     This component listens for events and directs them to the MPT.
-    Implements ``IObjectLifeCycleListener``,``IMetadataChangeListener``
+    Implements ``IObjectLifeCycleListener``,``IMetadataChangeListener``,``IAccessControlListener``
     """
 
-    implements(IMetadataChangeListener, IObjectLifeCycleListener)
+    implements(IMetadataChangeListener, IObjectLifeCycleListener, IAccessControlListener)
 
     def deleted(self, obj, oldOwner):
-        print "___DELETED CALL OBJ=",obj, oldOwner
+        #print "___DELETED CALL OBJ=",obj, oldOwner
         if toIndex(obj):
             rc = RepozeCatalog()
             # Use recursion
@@ -115,7 +113,7 @@ class ObjectChangeListener(Component):
                    
                         
     def infoChanged(self, obj):
-        print "___INFO CHANGED", obj
+        #print "___INFO CHANGED", obj
         if toIndex(obj):
             rc = RepozeCatalog()
             rc.unindexObject(obj)
@@ -131,6 +129,35 @@ class ObjectChangeListener(Component):
         pass                            
     def eventDatesChanged(cls, obj, oldStartDate, oldEndDate, newStartDate, newEndDate):
         pass
+
+    def protectionChanged(self, obj, oldProtection, newProtection):
+        if toIndex(obj):
+            rc = RepozeCatalog()
+            if newProtection == -1:
+                rc.indexObject(obj)
+            else:
+                rc.unindexObject(obj)            
+            rc.closeConnection()
+        #print "PROT CHANGE. FROM", oldProtection , " TO",newProtection
+        pass
+
+    def accessGranted(self, obj, who):
+        pass
+        
+    def accessRevoked(self, obj, who):
+        pass
+
+    def modificationGranted(self, obj, who):
+        pass
+
+    def modificationRevoked(self, obj, who):
+        pass
+        
+    def accessDomainAdded(self, obj, domain):
+        pass
+
+    def accessDomainRemoved(self, obj, domain):
+        pass   
 
 
 class PluginImplementationContributor(Component, Observable):
