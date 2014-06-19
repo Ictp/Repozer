@@ -186,7 +186,7 @@ class RepozeCatalog():
             obj._get_startDate = obj.getStartDate()
             obj._get_endDate = obj.getEndDate()
             obj._get_modificationDate = obj.getModificationDate()        
-            print "___Talk Title=",obj.getTitle()
+            #print "___Talk Title=",obj.getTitle()
             catalog.index_doc(doc_id, obj)
 
 
@@ -232,13 +232,13 @@ class RepozeCatalog():
                 PDFc.convert(fpath)
                 content = PDFc.text
                 res._content = content
-                print ".... indexing Material ",fpath, "___content=",content[:50]
+                #print ".... indexing Material ",fpath, "___content=",content[:50]
                 self._indexMat(res, catalog)
             if ftype in jod.av_ext:
                 jod.convert(fpath, ftype)
                 content = jod.text
                 res._content = content
-                print ".... indexing Material ",fpath, "___content=",content[:50]
+                #print ".... indexing Material ",fpath, "___content=",content[:50]
                 self._indexMat(res, catalog)
             PDFc = None
             jod = None
@@ -303,7 +303,7 @@ class RepozeCatalog():
             cat = self.db.root()[confCatalog]
             (hits, res) = cat.query(Eq('fid',fid))
             for doc_id in res:
-                print "__unindex fid=",fid,"__TITLE=", obj.getTitle()
+                #print "__unindex fid=",fid,"__TITLE=", obj.getTitle()
                 cat.unindex_doc(doc_id) 
 
             if recursive:
