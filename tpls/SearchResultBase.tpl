@@ -158,10 +158,7 @@
     
 </script>
 
-<script type="text/javascript" src="js/jquery.min.js"></script>
-<script type="text/javascript" src="js/yahoo-dom-event.js"></script>
-<script type="text/javascript" src="js/animation-min.js"></script>
-<script type="text/javascript" src="js/container-min.js"></script>
+
 
 <script type="text/javascript">
 	$(function() {
@@ -180,6 +177,11 @@
 </script>
 
 <%block name ="scripts">
+
+<script type="text/javascript" src="repozer/js/jquery.min.js"></script>
+<script type="text/javascript" src="repozer/js/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="repozer/js/animation-min.js"></script>
+<script type="text/javascript" src="repozer/js/container-min.js"></script>
 </%block>
 
 
