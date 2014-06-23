@@ -108,7 +108,7 @@ class ObjectChangeListener(Component):
             rc = RepozeCatalog()
             # Use recursion
             rc.unindexObject(obj, True)
-            oldOwner._notify('deleted', obj)
+            #oldOwner._notify('deleted', obj)            
             rc.closeConnection() 
                    
                         
