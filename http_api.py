@@ -47,8 +47,9 @@ class SearchHook(HTTPAPIHook):
         # To be implemented...
         self._text = get_query_parameter(self._queryParams, ['text'], None)
         
+
+
     def export_conference(self, aw):
-        
         return SearchFetcher(aw, self).searchRepoze(self)
 
         
@@ -64,7 +65,6 @@ class SearchFetcher(IteratedDataFetcher):
     def searchRepoze(self, params):
         #catalog = RepozeCatalog('repozercatalog_conference').catalog
         catalog = RepozeCatalog().catalog
-        
         localTimezone = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
         
         confId = None
@@ -103,6 +103,7 @@ class SearchFetcher(IteratedDataFetcher):
                 return self._process([])
             query = Le('startDate',today_ts) & Ge('endDate',today_ts) 
 
+        
         if params._todaybeyond != None:
             if params._todaybeyond == '':
                 td = time.strftime("%Y/%m/%d").split('/')
