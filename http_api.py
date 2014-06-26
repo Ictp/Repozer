@@ -74,10 +74,16 @@ class SearchFetcher(IteratedDataFetcher):
         
         if params._start_date:
             sdate = params._start_date.split('/')
-            startDate_ts = timezone(localTimezone).localize(datetime(int(sdate[0]), int(sdate[1]), int(sdate[2]), 0, 0))
+            try:
+                startDate_ts = timezone(localTimezone).localize(datetime(int(sdate[0]), int(sdate[1]), int(sdate[2]), 0, 0))
+            except:
+                return self._process([])
         if params._end_date:
             edate = params._end_date.split('/')
-            endDate_ts = timezone(localTimezone).localize(datetime(int(edate[0]), int(edate[1]), int(edate[2]), 23, 59))
+            try:
+                endDate_ts = timezone(localTimezone).localize(datetime(int(edate[0]), int(edate[1]), int(edate[2]), 23, 59))
+            except:
+                return self._process([])
         else:
             endDate_ts = None
         
@@ -89,9 +95,12 @@ class SearchFetcher(IteratedDataFetcher):
         if params._today != None:
             if params._today == '':
                 td = time.strftime("%Y/%m/%d").split('/')
-            else:
+            else:                
                 td = params._today.split('/')
-            today_ts = timezone(localTimezone).localize(datetime(int(td[0]), int(td[1]), int(td[2]), 23, 59))
+            try:
+                today_ts = timezone(localTimezone).localize(datetime(int(td[0]), int(td[1]), int(td[2]), 23, 59))
+            except:
+                return self._process([])
             query = Le('startDate',today_ts) & Ge('endDate',today_ts) 
 
         if params._todaybeyond != None:
@@ -99,12 +108,17 @@ class SearchFetcher(IteratedDataFetcher):
                 td = time.strftime("%Y/%m/%d").split('/')
             else:
                 td = params._todaybeyond.split('/')
-            
-            today_ts = timezone(localTimezone).localize(datetime(int(td[0]), int(td[1]), int(td[2]), 23, 59))
+            try:
+                today_ts = timezone(localTimezone).localize(datetime(int(td[0]), int(td[1]), int(td[2]), 23, 59))
+            except:
+                return self._process([])
             query = Le('startDate',today_ts) & Ge('endDate',today_ts) | Ge('startDate',today_ts)          
         
         if params._keywords:
-            kw = params._keywords.split(',')
+            if params._keywords.find(',') > -1:
+                kw = params._keywords.split(',')
+            else:
+                kw = [params._keywords]
             query = query & Any('keywords', kw)
             
         if params._keywordsAnd:
