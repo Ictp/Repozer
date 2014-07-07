@@ -142,7 +142,7 @@ class RepozeCatalog():
             if hasattr(obj, '_keywords') and len(obj._keywords)>0: 
                 obj._get_keywordsList = obj.getKeywords().replace('\r','').split('\n')
                  
-            obj._get_roles = ut.getRolesValues(obj)    
+            obj._get_roles = obj.getRolesJS()    
             obj._get_persons = ''
             if obj.getChairList(): 
                 obj._get_persons = ut.getTextFromAvatar(obj.getChairList())
@@ -177,7 +177,7 @@ class RepozeCatalog():
             obj._get_keywordsList = []     
             if hasattr(obj, '_keywords') and len(obj._keywords)>0: 
                  obj._get_keywordsList = obj.getKeywords().split('\n')
-            obj._get_roles = ut.getRolesValues(obj) 
+            obj._get_roles = obj.getRolesJS()
             obj._get_persons = ''
             if obj.getSpeakerList(): 
                 obj._get_persons = ut.getTextFromAvatar(obj.getSpeakerList())   
@@ -204,7 +204,7 @@ class RepozeCatalog():
         robj._get_keywordsList = []     
         if hasattr(obj, '_keywords') and len(obj._keywords)>0: 
              robj._get_keywordsList = obj.getKeywords().split('\n')
-        robj._get_roles = ''    
+        robj._get_roles = '[]'   
         robj._get_person = ''        
         robj._get_fid = fid
         localTimezone = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
