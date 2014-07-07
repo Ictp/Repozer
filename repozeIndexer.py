@@ -177,7 +177,7 @@ class RepozeCatalog():
             obj._get_keywordsList = []     
             if hasattr(obj, '_keywords') and len(obj._keywords)>0: 
                  obj._get_keywordsList = obj.getKeywords().split('\n')
-            obj._get_roles = obj.getRolesJS()
+            obj._get_roles = '[]' 
             obj._get_persons = ''
             if obj.getSpeakerList(): 
                 obj._get_persons = ut.getTextFromAvatar(obj.getSpeakerList())   
