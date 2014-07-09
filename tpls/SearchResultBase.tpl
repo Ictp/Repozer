@@ -44,13 +44,6 @@
                             <option value="roles" ${"selected" if f=="roles" else ""}>${ _("Roles")}</option>
                             <option value="persons" ${"selected" if f=="persons" else ""}>${ _("Speakers/Chairmans")}</option>
                             <option value="all" ${"selected" if f=="all" else ""}>${ _("All")}</option>
-
-
-                            <!--<option value="abstract">${ _("Talk description/Abstract")}</option>-->
-                            <!--<option value="author">${ _("Author/Speaker")}</option>-->
-                            <!--<option value="affiliation">${ _("Affiliation")}</option>-->
-                            <!--<option value="fulltext">${ _("Fulltext")}</option>-->
-                            <!--<option value="keyword">${ _("Keyword")}</option>-->
                           </select>
                         </td>
                       </tr>

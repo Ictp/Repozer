@@ -476,7 +476,8 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         if parameters['f'] == 'persons':
             query = self.addQuery(query,Contains('persons', title))
         if parameters['f'] == 'all':
-            query = self.addQuery(query,Eq('description', titleManaged) | Eq('title', titleManaged) | Contains('persons', title) | Contains('rolesVals', title))
+            r = unicode(parameters['p'], "UTF-8")   
+            query = self.addQuery(query,Eq('description', titleManaged) | Eq('title', titleManaged) | Contains('persons', title) | Contains('rolesVals', r.encode('ascii', 'xmlcharrefreplace')))
         if category != '':
             query = self.addQuery(query,Any('category', category))
         if collections != '':
