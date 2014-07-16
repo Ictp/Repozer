@@ -285,7 +285,10 @@ class RepozeCatalog():
             self.indexContribution(obj)
 
         if cname == 'LocalFile' and self.iMat:
-            self.indexMaterial(obj)
+            try:
+                self.indexMaterial(obj)
+            except:
+                pass
         
     
     def unindexObject(self, obj, recursive=False):
