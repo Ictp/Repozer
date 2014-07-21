@@ -18,7 +18,7 @@
                     </%block>
                 </div>
 
-                <form method="GET" action="${ searchAction }" style="width: 400px;">
+                <form method="GET" action="${ searchAction }" style="width: 500px;">
                 % if categId:
                     <input type="hidden" id="categId" name="categId" value="${ categId }"/>
                 % endif
@@ -38,7 +38,7 @@
                       <tr>
                         <td>${ _("Search in") }:</td>
                         <td>
-                          <select class="UIFieldSpan" name="f">
+                          <select class="UIFieldSpan" name="f" style="width: 100%;">
                             <option value="title_description" ${"selected" if f=="title_description" else ""}>${ _("Title and Description")}</option>
                             <option value="" ${"selected" if f=="" else ""}>${ _("Title only")}</option>
                             <option value="roles" ${"selected" if f=="roles" else ""}>${ _("Roles")}</option>
@@ -47,11 +47,17 @@
                           </select>
                         </td>
                       </tr>
+
+
+
+                      <%block name="searchCollection"></%block>
+
+
                                             
                     <tr>
                         <td style="text-align: right;">${ _("Category")}:</td>
                         <td>
-                            <select name="category">                  
+                            <select name="category" style="width: 100%;">                  
                                 <option value="" ${"selected" if category=="" else ""}>${ _("All")}</option>
                                 % for catkey in categories.keys():
                                     <option value="${catkey}" ${"selected" if category==catkey else ""}>${categories[catkey]}</option>
@@ -66,7 +72,7 @@
                             <input type="checkbox" name="wildcards" value="wildcards" ${"checked" if wildcards=="wildcards" else ""} /> (will take longer...)
                         </td>
                     </tr>
-
+<!--
 
                     <tr>
                         <td style="text-align: right;">${ _("Keyword")}:</td>
@@ -87,27 +93,29 @@
                             
                         </td>
                     </tr> 
+-->                      
+
                       
-                      <%block name="searchCollection">
-                      </%block>
+                      
                       <tr>
-                        <td>${ _("Start Date") }:</td>
+                        <td>${ _("Between Dates") }:</td>
                         <td>
                             <span id="startDatePlaceBox">
-                                <input name="startDate" id="startDatePlace" type="text" style="width:180px" value="${startDate}"/>
+                                <input name="startDate" id="startDatePlace" type="text" style="width:90px" value="${startDate}"/>
                             </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>${ _("End Date") }:</td>
-                        <td>
+                            and 
                             <span id="endDatePlaceBox">
-                                <input name="endDate" id="endDatePlace" type="text"  style="width:180px" value="${endDate}"/>
+                                <input name="endDate" id="endDatePlace" type="text"  style="width:90px" value="${endDate}"/>
                             </span>
+                            
+
                         </td>
                       </tr>
-                      <%block name="searchSorting">
-                      </%block>
+                      
+                      
+                      <%block name="searchSorting"></%block>
+                      
+                      
                     </table>
                 </div>
                 </form>

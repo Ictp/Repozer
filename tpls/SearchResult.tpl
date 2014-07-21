@@ -7,7 +7,7 @@
     <tr>
         <td>${ _("Search for") }:</td>
         <td>
-            <select class="UIFieldSpan" name="collections">
+            <select class="UIFieldSpan" name="collections" style="width: 100%;">
                 <option value="" ${"selected" if collections=="" else ""}>${ _("Events")}</option>
                 <option value="Contribution" ${"selected" if collections=="Contribution" else ""}>${ _("Contributions")}</option>
                 <option value="Material" ${"selected" if collections=="Material" else ""}>${ _("Materials")}</option>
@@ -20,21 +20,16 @@
 
 <%block name="searchSorting">
     <tr>
-        <td>${ _("Sort field") }:</td>
+        <td>${ _("Sort by") }:</td>
         <td>
-            <select class="UIFieldSpan" name="sortField" style="display: inline;">
-                <option value="" ${"selected" if sortField=="" else ""}>${ _("Date")}</option>
-                <option value="titleSorter" ${"selected" if sortField=="titleSorter" else ""}>${ _("Title")}</option>
-          </select>
-        </td>
-    </tr>
-    <tr>
-        <td>${ _("Sort order") }:</td>
-        <td>
-            <select class="UIFieldSpan" name="sortOrder" style="display: inline;">
+          <select class="UIFieldSpan" name="sortOrder" style="width: 50%;">
                 <option value="a" ${"selected" if sortOrder=="a" else ""}>${ _("Ascending")}</option>
                 <option value="d" ${"selected" if sortOrder=="d" else ""}>${ _("Descending")}</option>
             </select>
+            <select class="UIFieldSpan" name="sortField" style="width: 50%;">
+                <option value="" ${"selected" if sortField=="" else ""}>${ _("Date")}</option>
+                <option value="titleSorter" ${"selected" if sortField=="titleSorter" else ""}>${ _("Title")}</option>
+          </select>
         </td>
     </tr>
 </%block>
