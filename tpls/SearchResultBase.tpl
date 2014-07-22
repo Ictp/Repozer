@@ -98,14 +98,14 @@
                       
                       
                       <tr>
-                        <td>${ _("Between Dates") }:</td>
+                        <td>${ _("Between dates") }:</td>
                         <td>
                             <span id="startDatePlaceBox">
-                                <input name="startDate" id="startDatePlace" type="text" style="width:90px" value="${startDate}"/>
+                                <input name="startDate" id="startDatePlace" type="text" style="width:90px;" value="${startDate}"/>
                             </span>
                             and 
                             <span id="endDatePlaceBox">
-                                <input name="endDate" id="endDatePlace" type="text"  style="width:90px" value="${endDate}"/>
+                                <input name="endDate" id="endDatePlace" type="text"  style="width:90px;" value="${endDate}"/>
                             </span>
                             
 
@@ -115,6 +115,17 @@
                       
                       <%block name="searchSorting"></%block>
                       
+                      
+                      <tr>
+                        <td>${ _("Limit results to") }:</td>
+                        <td>
+                            <select name="limit" id="limit" style="width:100%;">                  
+                                <option value="" ${"selected" if limit=="" else ""}>250</option>
+                                <option value="1000" ${"selected" if limit=="1000" else ""}>1000</option>
+                                <option value="unlimited" ${"selected" if limit=="unlimited" else ""}>unlimited</option>                                
+                            </select>
+                        </td>
+                      </tr>
                       
                     </table>
                 </div>
@@ -147,10 +158,10 @@
             $("#advancedOptionsText").text($T("Show advanced options"));
         }
     });
-
+    % if len(eventResults) == 0:
     // Start showing advanced options
     $( "#advancedOptionsText" ).trigger( "click" );
-
+    % endif
 
     $("#startDatePlace").datepicker({ dateFormat: "dd/mm/yy", firstDay: 1, defaultDate:"${startDate}",changeMonth: true,
       changeYear: true});
@@ -161,28 +172,6 @@
 
 
 
-<script type="text/javascript">
-	$(function() {
 
-		for ( var i = 0; i < $('option').length; i++ ) {
-			$('a:eq(' + i + ')').attr( 'id', 'link-' + i );
-
-			new YAHOO.widget.Tooltip("myTip", {
-				context: 'link-' + i,
-				effect: { effect:YAHOO.widget.ContainerEffect.FADE, duration:0.30 },
-				showdelay: 0
-			} );
-		}
-
-	});
-</script>
-
-<%block name ="scripts">
-
-<script type="text/javascript" src="repozer/js/jquery.min.js"></script>
-<script type="text/javascript" src="repozer/js/yahoo-dom-event.js"></script>
-<script type="text/javascript" src="repozer/js/animation-min.js"></script>
-<script type="text/javascript" src="repozer/js/container-min.js"></script>
-</%block>
 
 

@@ -290,6 +290,10 @@ class RepozerBaseSEA:
     @SEA.translate ('keywords', 'text', 'keywords')
     def translateKeywords(self, keywords):
         return keywords  
+        
+    @SEA.translate ('limit', 'text', 'limit')
+    def translateKeywords(self, limit):
+        return limit  
                 
 
 class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
@@ -349,7 +353,9 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
                                                    f = self._filteredParams['f'],
                                                    wildcards = self._filteredParams['wildcards'],
                                                    sortField = self._filteredParams['sortField'],
-                                                   sortOrder = self._filteredParams['sortOrder'])
+                                                   sortOrder = self._filteredParams['sortOrder'],
+                                                   limit = self._filteredParams['limit']
+                                                   )
                                                    
             results.extend(r)
             
@@ -424,6 +430,7 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
         tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
         #print "PARAM=",parameters        
         titleManaged = ''
+        limit = 250
         
         query = None
         
@@ -461,7 +468,13 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
             keywords = parameters['keywords'].split(',')     
         if parameters['category'] != '':
             category = parameters['category'] 
-            
+        if parameters['limit'] != '':
+            if parameters['limit'] == 'unlimited':
+                limit = 100000
+            if parameters['limit'] == '1000':
+                limit = 1000
+        self._pagination = limit
+                
         ##### EXECUTE QUERY #####
 
         if parameters['p'] != '':

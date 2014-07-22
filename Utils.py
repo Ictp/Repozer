@@ -36,8 +36,10 @@ def getTextFromHtml(txt):
     s = ''
     if txt: 
         try:
-            sp = html.fromstring(txt).text_content()
-            s = ''.join(sp.splitlines())
+            doc = html.fromstring(txt)
+            for br in doc.xpath("*//br"):
+                br.tail = "\n" + br.tail if br.tail else "\n"
+            s = doc.text_content()
         except: 
             s = txt
     return s
