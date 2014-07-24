@@ -23,8 +23,8 @@
         <td>${ _("Sort by") }:</td>
         <td>
           <select class="UIFieldSpan" name="sortOrder" style="width: 50%;">
+                <option value="d" ${"selected" if sortOrder=="d" or ortOrder=="" else ""}>${ _("Descending")}</option>
                 <option value="a" ${"selected" if sortOrder=="a" else ""}>${ _("Ascending")}</option>
-                <option value="d" ${"selected" if sortOrder=="d" else ""}>${ _("Descending")}</option>
             </select>
             <select class="UIFieldSpan" name="sortField" style="width: 50%;">
                 <option value="" ${"selected" if sortField=="" else ""}>${ _("Date")}</option>

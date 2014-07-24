@@ -88,12 +88,16 @@ class ConferenceEntryRepozer(SearchResultRepozer):
         return self.confId
 
     def getTitle(self):
-        return self.getTarget().getTitle()
+        if self.getTarget():
+            return self.getTarget().getTitle()
+        else:
+            return ''
 
     def getStartDate(self, aw):
         tzUtil = DisplayTZ(aw,self.getConference())
         locTZ = tzUtil.getDisplayTZ()
-        if self.getTarget().getStartDate():
+        
+        if self.getTarget():
             return self.getTarget().getStartDate().astimezone(timezone(locTZ))
         else:
             return None    
@@ -105,7 +109,10 @@ class ConferenceEntryRepozer(SearchResultRepozer):
             return None
 
     def getDescription(self):
-        return self.getTarget().getDescription()
+        if self.getTarget():
+            return self.getTarget().getDescription()
+        else:
+            return ''
     
     def getDescriptionText(self):        
         # this is to avoid partial HTML 

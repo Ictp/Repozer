@@ -10,7 +10,7 @@
     % if result.getStartDate(accessWrapper):
          <small style="display: block;">${ result.getStartDate(accessWrapper).strftime("%Y-%m-%d %H:%M:%S (%Z)") }</small>
     % endif
-    % if not isinstance(result.getTarget(),MaKaC.conference.Conference):
+    % if not isinstance(result.getTarget(),MaKaC.conference.Conference) and result.getConference():
          <span style="display: block; font-style:italic; font-size:x-small;">${ result.getConference().getTitle()}</span>
     %endif
     

@@ -133,7 +133,9 @@ class RepozeCatalog():
             doc_id = catalog.document_map.new_docid()
             catalog.document_map.add(fid, doc_id) 
 
-            obj._get_description = ut.getTextFromHtml(obj.getDescription()) 
+            #obj._get_description = ut.getTextFromHtml(obj.getDescription()) 
+            txt = ut.getTextFromHtml(obj.getDescription()) 
+            obj._get_description = unicode(txt).encode('ascii', 'xmlcharrefreplace')
             obj._get_title = obj.getTitle().decode('utf8','ignore')
             obj._get_sorter = obj._get_title.lower().replace(" ", "")[:10]
             obj._get_collection = [ut.get_type(obj, '')]
@@ -142,7 +144,7 @@ class RepozeCatalog():
             if hasattr(obj, '_keywords') and len(obj._keywords)>0: 
                 obj._get_keywordsList = obj.getKeywords().replace('\r','').split('\n')
                  
-            obj._get_roles = obj.getRolesVal()    
+            obj._get_roles = obj.getRolesVal()   
             obj._get_persons = ''
             if obj.getChairList(): 
                 obj._get_persons = ut.getTextFromAvatar(obj.getChairList())
