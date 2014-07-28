@@ -172,7 +172,9 @@ class RepozeCatalog():
                 obj.endDate = obj.startDate + obj.duration
         
             obj._get_categoryList = ut.getCatFid(self.ch.getById(confId))    
-            obj._get_description = ut.getTextFromHtml(obj.getDescription()) 
+            #obj._get_description = ut.getTextFromHtml(obj.getDescription())
+            txt = ut.getTextFromHtml(obj.getDescription())
+            obj._get_description = unicode(txt).encode('ascii', 'xmlcharrefreplace')
             obj._get_title = obj.getTitle().decode('utf8','ignore')
             obj._get_sorter = obj._get_title.lower().replace(" ", "")[:10]
             obj._get_collection = [ut.get_type(obj, '')]
