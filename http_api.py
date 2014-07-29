@@ -98,10 +98,12 @@ class SearchFetcher(IteratedDataFetcher):
             else:                
                 td = params._today.split('/')
             try:
+                #today_ts = timezone(localTimezone).localize(datetime(int(td[0]), int(td[1]), int(td[2]), 23, 59))
                 today_ts = timezone(localTimezone).localize(datetime(int(td[0]), int(td[1]), int(td[2]), 23, 59))
+                end_today_ts = timezone(localTimezone).localize(datetime(int(td[0]), int(td[1]), int(td[2]), 00, 00))
             except:
                 return self._process([])
-            query = Le('startDate',today_ts) & Ge('endDate',today_ts) 
+            query = Le('startDate',today_ts) & Ge('endDate',end_today_ts) 
 
         
         if params._todaybeyond != None:
