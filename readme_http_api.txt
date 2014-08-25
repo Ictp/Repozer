@@ -1,4 +1,4 @@
-http://indico.ictp.it/indico/export/conference/search.xml?today=2013/04/10
+http://indico.website.com/export/conference/search.xml?today=2013/04/10
 .xml  : export type, can be: .xml/.json/.html/.atom
 today : if present, return all conferences which startDate <= today AND endDate >= today (running conferences)
 
@@ -28,4 +28,4 @@ As a result BOTH keywords must be presents
 - detail : specify output details level. Default: events
 
 Options: events, contributions, subcontributions, sessions
-eg: http://indico.ictp.it/indico/export/conference/search.xml?today=2013/04/10&detail=contributions 
+eg: http://indico.website.com/indico/export/conference/search.xml?today=2013/04/10&detail=contributions 

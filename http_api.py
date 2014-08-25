@@ -145,9 +145,9 @@ class SearchFetcher(IteratedDataFetcher):
             res.append(event)
         else:
             if params._limitQuery:
-                numdocs, results = catalog.query(query, limit=params._limitQuery)
+                numdocs, results = catalog.query(query, sort_index='startDate', reverse=True, limit=params._limitQuery)
             else:
-                numdocs, results = catalog.query(query)
+                numdocs, results = catalog.query(query, sort_index='startDate', reverse=True)
 
             #print "QUERY ENDED"    
 
