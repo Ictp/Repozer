@@ -19,8 +19,8 @@
                 <td style="text-align: right;">${ _("Search in")}</td>
                 <td>
                     <select name="f">
-                        <option value="title_description" ${"selected" if f=="title_description" else ""}>${ _("Title and Description")}</option>
-                        <option value="" ${"selected" if f=="" else ""}>${ _("Title only")}</option>
+                        <option value="" ${"selected" if f=="" else ""}>${ _("Title and Description")}</option>
+                        <option value="title_only" ${"selected" if f=="title_only" else ""}>${ _("Title only")}</option>
                         <option value="roles" ${"selected" if f=="roles" else ""}>${ _("Roles")}</option>
 
                         <!--<option value="abstract">${ _("Talk description/Abstract")}</option>-->

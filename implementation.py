@@ -486,9 +486,9 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
 
         if parameters['p'] != '':
             if parameters['f'] == '':
+                query = self.addQuery(query,Eq('description', titleManaged) | Eq('title', titleManaged))                
+            elif parameters['f'] == 'title_only': 
                 query = self.addQuery(query,Eq('title', titleManaged))
-            elif parameters['f'] == 'title_description': 
-                query = self.addQuery(query,Eq('description', titleManaged) | Eq('title', titleManaged))
                 
         if parameters['f'] == 'roles':
             r = unicode(parameters['p'], "UTF-8")     

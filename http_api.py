@@ -27,9 +27,9 @@ class SearchHook(HTTPAPIHook):
     RE = r'search'
     DEFAULT_DETAIL = 'events'
     MAX_RECORDS = {
-        'events': 100,
-        'contributions': 50,
-        'subcontributions': 50,
+        'events': 1000,
+        'contributions': 100,
+        'subcontributions': 100,
         'sessions': 100,
     }
 
@@ -88,9 +88,13 @@ class SearchFetcher(IteratedDataFetcher):
             endDate_ts = None
         
         if params._start_date:
-            #query = InRange('startDate',startDate_ts, endDate_ts)
+            #if endDate_ts:
+            #    query = Not(Lt('endDate',startDate_ts) | Gt('startDate',endDate_ts)) | (InRange('startDate',startDate_ts, endDate_ts))
+            #    # ESCLUDO le conf gia finite e quelle future, AGGIUNGO quelle senza endDate ma con startDate nel range
+            #else:
+            #    query = Not(Lt('endDate',startDate_ts)) | (Ge('startDate',startDate_ts))          
             query = Not(Lt('endDate',startDate_ts) | Gt('startDate',endDate_ts)) | (InRange('startDate',startDate_ts, endDate_ts))
-            # ESCLUDO le conf gia finite e quelle future, AGGIUNGO quelle senza endDate ma con startDate nel range
+            
 
         if params._today != None:
             if params._today == '':
@@ -145,9 +149,9 @@ class SearchFetcher(IteratedDataFetcher):
             res.append(event)
         else:
             if params._limitQuery:
-                numdocs, results = catalog.query(query, sort_index='startDate', reverse=True, limit=params._limitQuery)
+                numdocs, results = catalog.query(query, sort_index='startDate', reverse=False, limit=params._limitQuery)
             else:
-                numdocs, results = catalog.query(query, sort_index='startDate', reverse=True)
+                numdocs, results = catalog.query(query, sort_index='startDate', reverse=False)
 
             #print "QUERY ENDED"    
 

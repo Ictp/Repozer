@@ -39,8 +39,8 @@
                         <td>${ _("Search in") }:</td>
                         <td>
                           <select class="UIFieldSpan" name="f" style="width: 100%;">
-                            <option value="title_description" ${"selected" if f=="title_description" else ""}>${ _("Title and Description")}</option>
-                            <option value="" ${"selected" if f=="" else ""}>${ _("Title only")}</option>
+                            <option value="" ${"selected" if f=="" else ""}>${ _("Title and Description")}</option>
+                            <option value="title_only" ${"selected" if f=="title_only" else ""}>${ _("Title only")}</option>
                             <option value="roles" ${"selected" if f=="roles" else ""}>${ _("Roles")}</option>
                             <option value="persons" ${"selected" if f=="persons" else ""}>${ _("Speakers/Chairmans")}</option>
                             <option value="all" ${"selected" if f=="all" else ""}>${ _("All")}</option>

@@ -41,7 +41,7 @@
     <%include file="SearchNavigationForm.tpl" args="target = 'Events', direction='Prev'"/>
     <%include file="SearchNavigationForm.tpl" args="target = 'Contributions', direction='Prev'"/>
 
-    <h3 style="float:right;margin:0px;">Hits: ${ numHits }</h3>
+    <h3 id="hits" style="float:right;margin:0px;">Hits: ${ numHits }</h3>
 
     <div id="container" style="clear:both;">
         % if len(eventResults) > 0:
