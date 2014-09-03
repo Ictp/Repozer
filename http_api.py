@@ -44,6 +44,7 @@ class SearchHook(HTTPAPIHook):
         self._keywords = get_query_parameter(self._queryParams, ['keywords'], None)
         self._keywordsAnd = get_query_parameter(self._queryParams, ['keywordsAnd'], None)
         self._limitQuery = get_query_parameter(self._queryParams, ['limit'], None)        
+        self._desc = get_query_parameter(self._queryParams, ['desc'], False)        
         # To be implemented...
         self._text = get_query_parameter(self._queryParams, ['text'], None)
         
@@ -69,6 +70,9 @@ class SearchFetcher(IteratedDataFetcher):
         
         confId = None
         
+        if params._desc:
+            params._desc = True
+            
         if params._id:
             confId = params._id
         
@@ -149,9 +153,9 @@ class SearchFetcher(IteratedDataFetcher):
             res.append(event)
         else:
             if params._limitQuery:
-                numdocs, results = catalog.query(query, sort_index='startDate', reverse=False, limit=params._limitQuery)
+                numdocs, results = catalog.query(query, sort_index='startDate', reverse=params._desc, limit=params._limitQuery)
             else:
-                numdocs, results = catalog.query(query, sort_index='startDate', reverse=False)
+                numdocs, results = catalog.query(query, sort_index='startDate', reverse=params._desc)
 
             #print "QUERY ENDED"    
 
