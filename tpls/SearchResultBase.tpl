@@ -28,7 +28,7 @@
                 
                 
                 <div>
-                  <input style="width: 300px; height:20px; font-size:17px; vertical-align: middle;" type="text" name="p" value=${ quoteattr(p) } />
+                  <input style="width: 300px; font-size:17px; vertical-align: middle;" type="text" name="p" value=${ quoteattr(p) } />
                   <input type="submit" value="${ _('Search')}" style="vertical-align: middle;"/>
                 </div>
 
