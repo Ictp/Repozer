@@ -102,6 +102,16 @@ class ConferenceEntryRepozer(SearchResultRepozer):
         else:
             return None    
 
+    def getEndDate(self, aw):
+        tzUtil = DisplayTZ(aw,self.getConference())
+        locTZ = tzUtil.getDisplayTZ()
+        
+        if self.getTarget():
+            return self.getTarget().getEndDate().astimezone(timezone(locTZ))
+        else:
+            return None    
+
+
     def getConference(self):
         try:
             return self.ch.getById(self.confId)
@@ -191,6 +201,9 @@ class MaterialEntryRepozer(ConferenceEntryRepozer,RepozerMaterial):
         return ''
                     
     def getStartDate(self, aw):
+        return None
+
+    def getEndDate(self, aw):
         return None
                 
     def getTarget(self):

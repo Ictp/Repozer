@@ -8,8 +8,13 @@
         </a>
     % endif    
     % if result.getStartDate(accessWrapper):
-         <small style="display: block;">${ result.getStartDate(accessWrapper).strftime("%Y %B %d") }</small>
+        <small style="display: block;">${ result.getStartDate(accessWrapper).strftime("%d %B %Y") }   
+        % if result.getEndDate(accessWrapper):
+            - ${ result.getEndDate(accessWrapper).strftime("%d %B %Y") } 
+        % endif
+        </small>
     % endif
+
     % if not isinstance(result.getTarget(),MaKaC.conference.Conference) and result.getConference():
          <span style="display: block; font-style:italic; font-size:x-small;">${ result.getConference().getTitle()}</span>
     %endif
