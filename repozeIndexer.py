@@ -140,7 +140,7 @@ class RepozeCatalog():
             obj._get_sorter = obj._get_title.lower().replace(" ", "")[:10]
             obj._get_collection = [ut.get_type(obj, '')]
             obj._get_keywordsList = []     
-            obj._get_categoryList = ut.getCatFid(obj)
+            obj._get_categoryList = ut.getCat(obj)
             if hasattr(obj, '_keywords') and len(obj._keywords)>0: 
                 obj._get_keywordsList = obj.getKeywords().replace('\r','').split('\n')
                  
@@ -171,7 +171,7 @@ class RepozeCatalog():
             if hasattr(obj, 'duration') and obj.duration:
                 obj.endDate = obj.startDate + obj.duration
         
-            obj._get_categoryList = ut.getCatFid(self.ch.getById(confId))    
+            obj._get_categoryList = ut.getCat(self.ch.getById(confId))    
             #obj._get_description = ut.getTextFromHtml(obj.getDescription())
             txt = ut.getTextFromHtml(obj.getDescription())
             obj._get_description = unicode(txt).encode('ascii', 'xmlcharrefreplace')
@@ -200,7 +200,7 @@ class RepozeCatalog():
         fid = ut.getFid(robj)
         confId, sessionId, talkId, materialId = fid.split("|")
         catalog.document_map.add(fid, doc_id) 
-        robj._get_categoryList = ut.getCatFid(self.ch.getById(confId))
+        robj._get_categoryList = ut.getCat(self.ch.getById(confId))
         robj._get_description = robj.getDescription()
         robj._get_title = robj.getTitle()
         robj._get_sorter = robj._get_title.lower().replace(" ", "")[:10]

@@ -88,24 +88,39 @@ def getFid(obj):
     return fid
 
 
-def getCatFid(obj):  
+def getCat(obj):  
     catList = []
     catowner = obj.getOwner()
-    try:
-        catId = obj.getOwner().getId()
-    except:
-        catId = 0
+    try: catId = obj.getOwner().getId()
+    except: catId = 0
     catList.append(catId)
-    try:
-        catowner = catowner.getOwner()
-    except:
-        return []
+    try: catowner = catowner.getOwner()
+    except: return []
     while catowner:
-        catId += "|"+catowner.getId()
+        catId = catowner.getId()
         if catowner.name != 'Home':
             catList.append(catId.decode('utf8'))
         catowner = catowner.getOwner()
     return catList
+
+# def getCatFid(obj):  
+#     catList = []
+#     catowner = obj.getOwner()
+#     try:
+#         catId = obj.getOwner().getId()
+#     except:
+#         catId = 0
+#     catList.append(catId)
+#     try:
+#         catowner = catowner.getOwner()
+#     except:
+#         return []
+#     while catowner:
+#         catId += "|"+catowner.getId()
+#         if catowner.name != 'Home':
+#             catList.append(catId.decode('utf8'))
+#         catowner = catowner.getOwner()
+#     return catList
 
     
 def getTextFromAvatar(alist):

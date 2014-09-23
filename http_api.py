@@ -138,6 +138,9 @@ class SearchFetcher(IteratedDataFetcher):
         
         if params._category:
             kw = params._category.split(',')
+            # TEMPORARY FIX FOR Throughout the year:
+            if '2l133' in kw:
+                kw.extend(['6','3l161','3l162','7','3l163','3l164','3l165','3','3l167','3l168','3l169','4','5','3l171','3l172'])
             query = query & Any('category', kw)
         
         # Just return Conference objs
