@@ -133,10 +133,11 @@ class ObjectChangeListener(Component):
     def protectionChanged(self, obj, oldProtection, newProtection):
         if toIndex(obj):
             rc = RepozeCatalog()
-            if newProtection == -1:
-                rc.indexObject(obj)
+            if obj.hasAnyProtection():
+                rc.unindexObject(obj) 
             else:
-                rc.unindexObject(obj)            
+                rc.indexObject(obj)
+                           
             rc.closeConnection()
         #print "PROT CHANGE. FROM", oldProtection , " TO",newProtection
         pass
