@@ -126,8 +126,10 @@ class RepozeCatalog():
         transaction.commit()
 
         
-    def indexConference(self, obj, catalog=None):
-        if not(obj.hasAnyProtection()):        
+    def indexConference(self, obj, catalog=None):        
+        try: p = obj.hasAnyProtection()
+        except: p = True
+        if not(p):        
             if not catalog: catalog = self.db.root()[confCatalog]
             fid = ut.getFid(obj)
             doc_id = catalog.document_map.new_docid()
