@@ -32,6 +32,8 @@ def get_type(object, default):
 
 
 
+
+
 def getTextFromHtml(txt):
     s = ''
     if txt: 
