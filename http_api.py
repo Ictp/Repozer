@@ -142,6 +142,9 @@ class SearchFetcher(IteratedDataFetcher):
         
         # Just return Conference objs
         query = query & Eq('collection', 'Conference')
+
+        # ICTP SPECIFIC: do not add Conference with keyword = NOSCIAL
+        query = query & Not(Any('keywords', 'NOSCICAL'))
                
                
         #print "QUERY STARTED" 
