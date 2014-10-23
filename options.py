@@ -56,6 +56,7 @@ contribCatalog = 'rc_Contribution'
 matCatalog = 'rc_Material'
 
 availableKeywords = [
+'NOSCICAL',
 'Acceleratory Mass Spectroscopy',
 'Aeronomy',
 'Algebra',
