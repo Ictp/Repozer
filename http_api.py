@@ -45,6 +45,8 @@ class SearchHook(HTTPAPIHook):
         self._keywordsAnd = get_query_parameter(self._queryParams, ['keywordsAnd'], None)
         self._limitQuery = get_query_parameter(self._queryParams, ['limit'], None)        
         self._desc = get_query_parameter(self._queryParams, ['desc'], False)        
+        self._valid_deadline = get_query_parameter(self._queryParams, ['valid_deadline'], None)
+
         # To be implemented...
         self._text = get_query_parameter(self._queryParams, ['text'], None)
         
@@ -72,6 +74,9 @@ class SearchFetcher(IteratedDataFetcher):
         
         if params._desc:
             params._desc = True
+
+        if params._valid_deadline:
+            params._valid_deadline = True
             
         if params._id:
             confId = params._id
@@ -139,6 +144,12 @@ class SearchFetcher(IteratedDataFetcher):
         if params._category:
             kw = params._category.split(',')
             query = query & Any('category', kw)
+
+        if params._valid_deadline:
+            #today = timezone(localTimezone).localize(datetime.now())
+            today = datetime.now()
+            query = query & Gt('deadlineDate', today) & NotEq('deadlineDate', datetime.strptime('01/01/1970', '%d/%m/%Y'))
+
         
         # Just return Conference objs
         query = query & Eq('collection', 'Conference')

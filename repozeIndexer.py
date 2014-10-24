@@ -120,6 +120,10 @@ class RepozeCatalog():
         catalog['rolesVals'] = CatalogTextIndex('_get_roles')
         catalog['persons'] = CatalogTextIndex('_get_persons')
 
+        # ICTP SPECIFIC: index a deadline date if found. Just COMMENT this line if not interested
+        catalog['deadlineDate'] = CatalogFieldIndex('_get_deadlineDate')
+
+
         self.db.root()[self.catalogName] = catalog
         self.catalog = self.db.root()[self.catalogName] 
         # commit the indexes
@@ -154,7 +158,13 @@ class RepozeCatalog():
             obj._get_fid = fid
             obj._get_startDate = obj.getStartDate()
             obj._get_endDate = obj.getEndDate()       
-            obj._get_modificationDate = obj.getModificationDate()        
+            obj._get_modificationDate = obj.getModificationDate()   
+            # cannot use dd = None, so I set it to 01/01/1970
+            dd = obj.getDeadlineDate()
+            if not dd: dd = datetime.strptime('01/01/1970', '%d/%m/%Y')
+            print "Indexing deadline=", dd
+            obj._get_deadlineDate = dd
+   
             catalog.index_doc(doc_id, obj)    
 
 
@@ -277,7 +287,6 @@ class RepozeCatalog():
 
     
     def indexObject(self, obj):
-
         cname = obj.__class__.__name__
         if cname == 'Conference' and self.iConf:
             objExist = True
@@ -297,8 +306,7 @@ class RepozeCatalog():
                 pass
         
     
-    def unindexObject(self, obj, recursive=False):
-        
+    def unindexObject(self, obj, recursive=False):        
         fid = ut.getFid(obj)
         if fid == '|||': return
         conf = None

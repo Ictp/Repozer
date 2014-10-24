@@ -138,6 +138,7 @@ class ConferenceEntryRepozer(SearchResultRepozer):
         return str(urlHandlers.UHConferenceDisplay.getURL(confId=self.getId()))    
 
 
+
 class ContributionEntryRepozer(ConferenceEntryRepozer):
 
     def getId(self):
