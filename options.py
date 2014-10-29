@@ -64,6 +64,7 @@ availableKeywords = [
 'Applicable Mathematics',
 'Applied Physics',
 'Atomic and Molecular Physics',
+'Basic Notions',
 'Biophysics',
 'Biosciences',
 'Climate Change and Impacts',
