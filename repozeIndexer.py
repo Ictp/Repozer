@@ -250,16 +250,16 @@ class RepozeCatalog():
             if ftype in PDFc.av_ext: 
                 # I do not use pyPDF because most of PDF are protected  
                 
-                print "CONVERSIONE PDF IN CORSO...", str(datetime.now())              
+                #print "CONVERSIONE PDF IN CORSO...", str(datetime.now())              
                 PDFc.convert(fpath)
                 content = PDFc.text
                 res._content = content
-                print "...CONVERSIONE PDF CONCLUSA", str(datetime.now())
-                print "START INDEXING", str(datetime.now())
+                #print "...CONVERSIONE PDF CONCLUSA", str(datetime.now())
+                #print "START INDEXING", str(datetime.now())
                 #print ".... indexing Material ",fpath, "___content=",content[:50]
                 self._indexMat(res, catalog)
 
-                print "FINISHED INDEXING", str(datetime.now())
+                #print "FINISHED INDEXING", str(datetime.now())
                 
             if ftype in jod.av_ext:
                 jod.convert(fpath, ftype)
