@@ -54,7 +54,7 @@ def buildCatalog():
         
     for c in ch.getValuesToList():
         if curnum >= startFrom:
-            print "___________"+curnum,".......confid=",c.getId()                
+            print "___________",curnum,".......confid=",c.getId()                
             rc.fullIndex(c) 
             transaction.commit()
         curnum += 1

@@ -27,6 +27,7 @@ from indico.ext.search.repozer.options import confCatalog, contribCatalog, matCa
 from indico.ext.search.repozer.converters import *
 from repoze.catalog.query import *
 
+
 class RepozerMaterial():
     
     def __init__(self, obj=None):
@@ -150,7 +151,10 @@ class RepozeCatalog():
             if hasattr(obj, '_keywords') and len(obj._keywords)>0: 
                 obj._get_keywordsList = obj.getKeywords().replace('\r','').split('\n')
                  
-            obj._get_roles = obj.getRolesVal()   
+            obj._get_roles = '[]'
+            if "getRolesVal" in dir(obj):
+                obj._get_roles = obj.getRolesVal()   
+
             obj._get_persons = ''
             if obj.getChairList(): 
                 obj._get_persons = ut.getTextFromAvatar(obj.getChairList())
@@ -244,12 +248,19 @@ class RepozeCatalog():
             PDFc = pdf2txt()
             jod = jodconverter2txt()                
             if ftype in PDFc.av_ext: 
-                # I do not use pyPDF because most of PDF are protected                
+                # I do not use pyPDF because most of PDF are protected  
+                
+                print "CONVERSIONE PDF IN CORSO...", str(datetime.now())              
                 PDFc.convert(fpath)
                 content = PDFc.text
                 res._content = content
+                print "...CONVERSIONE PDF CONCLUSA", str(datetime.now())
+                print "START INDEXING", str(datetime.now())
                 #print ".... indexing Material ",fpath, "___content=",content[:50]
                 self._indexMat(res, catalog)
+
+                print "FINISHED INDEXING", str(datetime.now())
+                
             if ftype in jod.av_ext:
                 jod.convert(fpath, ftype)
                 content = jod.text
@@ -288,6 +299,10 @@ class RepozeCatalog():
     
     def indexObject(self, obj):
         cname = obj.__class__.__name__
+        
+        print "__INDEXING__", obj, " __TYPE__ ", cname
+        print "STARTED AT", str(datetime.now())
+        
         if cname == 'Conference' and self.iConf:
             objExist = True
             try: o = self.ch.getById(obj.getId())
@@ -299,11 +314,15 @@ class RepozeCatalog():
         if cname == 'Contribution' and self.iContrib:
             self.indexContribution(obj)
 
-        if cname == 'LocalFile' and self.iMat:
-            try:
-                self.indexMaterial(obj)
-            except:
-                pass
+        if cname == 'LocalFile':
+            if self.iMat:
+                try:
+                    self.indexMaterial(obj)
+                except:
+                    pass
+            else:
+                catalog = self.db.root()[matCatalog]
+                catalog
         
     
     def unindexObject(self, obj, recursive=False):        
