@@ -164,9 +164,11 @@ class RepozeCatalog():
             obj._get_endDate = obj.getEndDate()       
             obj._get_modificationDate = obj.getModificationDate()   
             # cannot use dd = None, so I set it to 01/01/1970
-            dd = obj.getDeadlineDate()
+            
+            dd = None
+            if "getDeadlineDate" in dir(obj):
+                dd = obj.getDeadlineDate()                
             if not dd: dd = datetime.strptime('01/01/1970', '%d/%m/%Y')
-            #print "Indexing deadline=", dd
             obj._get_deadlineDate = dd
    
             catalog.index_doc(doc_id, obj)    
