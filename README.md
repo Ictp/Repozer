@@ -96,14 +96,14 @@ With Repozer > 0.9.2 Materials are now indexable!!! You will be able to search f
 
 - Add some code to MaKaC/conference.py to notify creation/editing/deleting od Materials:
 
-@ line 11368, right after:  parent.setModificationDate()
+@ line 11368, (Resource class, notifyModification method) right after:  parent.setModificationDate()
 
 ```
             # added for Indexing
             self._notify('infoChanged')
 ```
 
-@ line 11452, right after:          if self._owner is not None:
+@ line 11452, (Resource class, delete method) right after:  if self._owner is not None:
 
 ```
             # notifiy deleting for indexing
