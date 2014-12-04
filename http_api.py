@@ -38,6 +38,7 @@ class SearchHook(HTTPAPIHook):
         self._id = get_query_parameter(self._queryParams, ['id'], None)
         self._start_date = get_query_parameter(self._queryParams, ['start_date'], '1970/01/01')
         self._end_date = get_query_parameter(self._queryParams, ['end_date'], None)
+        self._started = get_query_parameter(self._queryParams, ['started'], None)
         self._today = get_query_parameter(self._queryParams, ['today'], None)
         self._todaybeyond = get_query_parameter(self._queryParams, ['todaybeyond'], None)
         self._category = get_query_parameter(self._queryParams, ['category'], None)
@@ -95,7 +96,12 @@ class SearchFetcher(IteratedDataFetcher):
                 return self._process([])
         else:
             endDate_ts = None
-        
+                    
+
+            
+
+
+
         if params._start_date:
             #if endDate_ts:
             #    query = Not(Lt('endDate',startDate_ts) | Gt('startDate',endDate_ts)) | (InRange('startDate',startDate_ts, endDate_ts))
@@ -103,6 +109,16 @@ class SearchFetcher(IteratedDataFetcher):
             #else:
             #    query = Not(Lt('endDate',startDate_ts)) | (Ge('startDate',startDate_ts))          
             query = Not(Lt('endDate',startDate_ts) | Gt('startDate',endDate_ts)) | (InRange('startDate',startDate_ts, endDate_ts))
+
+
+        if params._started != None:
+            ssdate = params._started.split('/')
+            try:
+                started_ts = timezone(localTimezone).localize(datetime(int(ssdate[0]), int(ssdate[1]), int(ssdate[2]), 0, 0))
+            except:
+                return self._process([])
+            query = Ge('startDate',started_ts)
+
             
 
         if params._today != None:
