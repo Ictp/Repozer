@@ -302,8 +302,8 @@ class RepozeCatalog():
     def indexObject(self, obj):
         cname = obj.__class__.__name__
         
-        print "__INDEXING__", obj, " __TYPE__ ", cname
-        print "STARTED AT", str(datetime.now())
+        #print "__INDEXING__", obj, " __TYPE__ ", cname
+        #print "STARTED AT", str(datetime.now())
         
         if cname == 'Conference' and self.iConf:
             objExist = True
