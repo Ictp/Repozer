@@ -102,7 +102,7 @@ class RepozerQueryManager():
             
     def checkParams(self):        
         params = self.params         
-          
+
         if params.has_key('text'):
             text = params.get('text', None)
             
@@ -140,13 +140,14 @@ class RepozerQueryManager():
         
         if params.has_key('start_date'):
             sdate = params['start_date'].split('/')
-            try:
+            if 1:
+            #try:
                 startDate_ts = timezone(localTimezone).localize(datetime(int(sdate[0]), int(sdate[1]), int(sdate[2]), 0, 0))
                 datesAvailable = True
-            except:
-                self.setQuery(None)
-                return
-            
+            #except:
+            #    self.setQuery(None)
+            #    return
+         
         if params.has_key('end_date'):
             edate = params['end_date'].split('/')
             try:

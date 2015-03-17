@@ -31,33 +31,24 @@ from MaKaC.webinterface import urlHandlers
 from MaKaC.common.timezoneUtils import DisplayTZ
 
 from xml.dom import minidom
-
 from urllib import urlencode
 import urllib2
-
 from MaKaC.plugins.base import PluginsHolder
 from indico.ext.search.repozer.repozeIndexer import RepozeCatalog, RepozerMaterial
-
-
-from repoze.catalog.query import *
-
-
 from datetime import datetime
 import time
 from pytz import timezone
-import MaKaC.common.info as info
-
-
-
 import Utils as ut
 
 # Ictp: without this, apache wont recognize repozer export :(
 import indico.ext.search.repozer.http_api
 
 from repozerQueryManager import RepozerQueryManager
-
 from indico.ext.search.repozer.options import availableKeywords as keywords
 from indico.ext.search.repozer.options import confCatalog, contribCatalog, matCatalog
+
+
+
 
 SEA = SEATranslator("repozer")
 
@@ -442,10 +433,10 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
             parameters['text'] = parameters['p']
         if parameters.has_key('sortField'):
             parameters['sort_field'] = parameters['sortField']
-        if parameters.has_key('startDate'):
-            parameters['start_date'] = parameters['startDate']
-        if parameters.has_key('endDate'):
-            parameters['end_date'] = parameters['endDate']
+        if parameters.has_key('startDate') and parameters['startDate']:
+            parameters['start_date'] = time.strftime("%Y/%m/%d", time.strptime(parameters['startDate'], "%d/%m/%Y"))
+        if parameters.has_key('endDate')and parameters['endDate']:
+            parameters['end_date'] = time.strftime("%Y/%m/%d", time.strptime(parameters['endDate'], "%d/%m/%Y"))
         if parameters.has_key('sortOrder'):
             if parameters['sortOrder'] != 'a':
                 parameters['desc'] = 1     

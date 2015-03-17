@@ -26,7 +26,11 @@
                     <input type="hidden" name="confId" value="${ confId }"/>
                 % endif
                 
-                
+                <div>
+                    <h6>Text search will search for exact words. </h6>
+                    <h6>To search for substrings, use "*". Eg: "math*"</h6>
+
+                </div>
                 <div>
                   <input style="width: 300px; font-size:17px; vertical-align: middle;" type="text" name="p" value=${ quoteattr(p) } />
                   <input type="submit" value="${ _('Search')}" style="vertical-align: middle;"/>
@@ -34,6 +38,7 @@
 
                 <div style="padding-top: 4px;"><span id="advancedOptionsText" class='fakeLink'>${_("Show advanced options") }</span></div>
                 <div id="advancedOptions" style="display: none;">
+                    
                     <table style="text-align: right;" id="advancedOptionsTable">
                       <tr>
                         <td>${ _("Search in") }:</td>
@@ -66,12 +71,7 @@
                         </td>
                     </tr>
 
-                    <tr>
-                        <td style="text-align: right;">${ _("Use wildcards") }:</td>
-                        <td>
-                            <input type="checkbox" name="wildcards" value="wildcards" ${"checked" if wildcards=="wildcards" else ""} /> (will take longer...)
-                        </td>
-                    </tr>
+
 <!--
 
                     <tr>
