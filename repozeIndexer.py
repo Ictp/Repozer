@@ -46,7 +46,7 @@ class RepozerMaterial():
             self.ext = '.' + locator['fileExt']
 
             self.title = obj.name.decode('utf8')
-            self.description = obj._content
+            self.description = getattr(obj,'_content','')
             self.conference = self._owner.getConference()
             self.session = self._owner.getSession()
             self.contribution = self._owner.getContribution()
@@ -246,7 +246,7 @@ class RepozeCatalog():
                 fpath = res.getFilePath()
             except:
                 ftype = None
-            content = ''
+            content = ''            
             PDFc = pdf2txt()
             jod = jodconverter2txt()                
             if ftype in PDFc.av_ext: 

@@ -37,6 +37,8 @@ import urllib2
 
 from MaKaC.plugins.base import PluginsHolder
 from indico.ext.search.repozer.repozeIndexer import RepozeCatalog, RepozerMaterial
+
+
 from repoze.catalog.query import *
 
 
@@ -44,10 +46,15 @@ from datetime import datetime
 import time
 from pytz import timezone
 import MaKaC.common.info as info
+
+
+
 import Utils as ut
 
 # Ictp: without this, apache wont recognize repozer export :(
 import indico.ext.search.repozer.http_api
+
+from repozerQueryManager import RepozerQueryManager
 
 from indico.ext.search.repozer.options import availableKeywords as keywords
 from indico.ext.search.repozer.options import confCatalog, contribCatalog, matCatalog
@@ -173,8 +180,8 @@ class MaterialEntryRepozer(ConferenceEntryRepozer,RepozerMaterial):
                 obj = s.getContributionById(self.talkId)
             else: obj = conf.getContributionById(self.talkId)
         else: obj = conf
-
-        self.mat = obj.getMaterialById(self.matId)
+        self.mat = None
+        if obj: self.mat = obj.getMaterialById(self.matId)        
         self.robj = None
         self.ext = ''
         if self.mat:
@@ -257,13 +264,10 @@ class RepozerBaseSEA:
 
     @SEA.translate(['startDate', 'endDate'],'date', 'p')
     def translateDates(self, startDate, endDate):
-
         if startDate != '':
             startDate = time.strftime("%Y-%m-%d", time.strptime(startDate, "%d/%m/%Y"))
         if endDate != '':
             endDate = (datetime.datetime.strptime(endDate, "%d/%m/%Y") + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
-
-
         if startDate != '' and endDate != '':
             return '"%s"->"%s"' % (startDate, endDate)
         elif startDate != '':
@@ -429,119 +433,39 @@ class RepozerSEA(RepozerBaseSEA, SearchEngineCallAPIAdapter):
 
         return (numPreResults, results)
 
-    def addQuery(self, query, elem):
-        if not query:
-            return elem
-        else:
-            return query & elem
+
 
     def _fetchResultsFromServer(self, parameters):
 
+        # add dictonary keys for RepozerQueryManager        
+        if parameters.has_key('p'):
+            parameters['text'] = parameters['p']
+        if parameters.has_key('sortField'):
+            parameters['sort_field'] = parameters['sortField']
+        if parameters.has_key('startDate'):
+            parameters['start_date'] = parameters['startDate']
+        if parameters.has_key('endDate'):
+            parameters['end_date'] = parameters['endDate']
+        if parameters.has_key('sortOrder'):
+            if parameters['sortOrder'] != 'a':
+                parameters['desc'] = 1     
+        if parameters.has_key('f'):
+            parameters['where'] = parameters['f']
+        if parameters.has_key('numRecords'):
+            parameters['limit'] = parameters['numRecords']
 
+        # do not convert to Conference objects
+        parameters['onlyFids'] = True
         
-        collections = 'Conference'
-        title = ''
-        searchSMR = False
-        startDate = None
-        endDate = None
-        sortField = 'startDate'
-        sortReverse = True
-        category = ''
-        keywords = []
-        tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
-        #print "PARAM=",parameters        
-        titleManaged = ''
-        limit = 250
-        
-        query = None
-        
-        if parameters['p'] != '':
-            # Ictp specific:
-            if parameters['p'].startswith('smr'):
-                searchSMR = True
-                keywords = parameters['p'].replace(' ','')
-            else:                  
-                title = parameters['p'].decode('utf8')
-                titleManaged = title
-                if parameters['wildcards']:
-                    ts = title.split(" ")
-                    titleManaged = "*"+"* *".join(ts)+"*"
-                #print titleWilcard
-        #else:
-        #    return (0, [])
-        
-        
-        if parameters['startDate'] != '':
-            sdd,sdm,sdy = parameters['startDate'].split('/')
-            startDate = timezone(tz).localize(datetime( int(sdy), int(sdm), int(sdd), 0, 0 ))  
-        if parameters['endDate'] != '':
-            sdd,sdm,sdy = parameters['endDate'].split('/')
-            endDate = timezone(tz).localize(datetime( int(sdy), int(sdm), int(sdd), 0, 0 ))     
-        if parameters['collections'] != '':
-            collections = parameters['collections']
-            if parameters['collections'] == 'All':
-                collections = ''      
-        if parameters['sortOrder'] == 'a':
-            sortReverse = False
-        if parameters['sortField'] != '':
-            sortField = parameters['sortField']
-        if parameters['keywords'] != '':
-            keywords = parameters['keywords'].split(',')     
-        if parameters['category'] != '':
-            category = parameters['category'] 
-        if parameters['limit'] != '':
-            if parameters['limit'] == 'unlimited':
-                limit = 100000
-            if parameters['limit'] == '1000':
-                limit = 1000
-        self._pagination = limit
-                
-        ##### EXECUTE QUERY #####
-
-        if parameters['p'] != '':
-            if parameters['f'] == '':
-                query = self.addQuery(query,Eq('description', titleManaged) | Eq('title', titleManaged))                
-            elif parameters['f'] == 'title_only': 
-                query = self.addQuery(query,Eq('title', titleManaged))
-                
-        if parameters['f'] == 'roles':
-            r = unicode(parameters['p'], "UTF-8")     
-            query = self.addQuery(query,Contains('rolesVals', r.encode('ascii', 'xmlcharrefreplace')))   
-        if parameters['f'] == 'persons':
-            query = self.addQuery(query,Contains('persons', title))
-        if parameters['f'] == 'all':
-            r = unicode(parameters['p'], "UTF-8")   
-            query = self.addQuery(query,Eq('description', titleManaged) | Eq('title', titleManaged) | Contains('persons', title) | Contains('rolesVals', r.encode('ascii', 'xmlcharrefreplace')))
-        if category != '':
-            query = self.addQuery(query,Any('category', category))
-        if collections != '':
-            query = self.addQuery(query,Any('collection', collections))
-        if keywords != []:
-            query = self.addQuery(query,Any('keywords', keywords))
-
-        if startDate:                    
-            query = self.addQuery(query,InRange('startDate',startDate, endDate))
-
-        # Ictp specific:
-        if searchSMR:
-            query = Any('keywords', keywords)    
-
-        if not(title or startDate or endDate or category or keywords):
-            return (0, [])
-
-        rc = RepozeCatalog()
-        if collections == 'Material':
-            rc = RepozeCatalog(matCatalog)
-        if collections == 'Contribution':
-            rc = RepozeCatalog(contribCatalog)
-
-        catalog = rc.catalog
-
-            
-        numdocs, results = catalog.query(query, sort_index=sortField, reverse=sortReverse, limit=self._pagination) 
-        # Convert doc_ids to fid
-        results = [catalog.document_map.address_for_docid(result) for result in results]                  
-        
+        # remove val = ''
+        p = {}
+        for par in parameters.keys():
+            if parameters[par] != '':
+                p[par] = parameters[par]
+                         
+        rqm = RepozerQueryManager(p)
+        numdocs, results = rqm.getResults()      
+                             
         return (numdocs, results)
 
 
