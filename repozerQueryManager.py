@@ -102,7 +102,7 @@ class RepozerQueryManager():
             
     def checkParams(self):        
         params = self.params         
-
+        print params
         if params.has_key('text'):
             text = params.get('text', None)
             
@@ -207,7 +207,7 @@ class RepozerQueryManager():
             self.addQuery( All('keywords', kw) )
         
         if params.has_key('category'):
-            kw = params['category']
+            kw = params['category'].split(',')
             self.addQuery( Any('category', kw) )
         
         # ICTP SPECIFIC
