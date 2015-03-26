@@ -102,7 +102,7 @@ class RepozerQueryManager():
             
     def checkParams(self):        
         params = self.params         
-        print params
+        #print params
         if params.has_key('text'):
             text = params.get('text', None)
             
