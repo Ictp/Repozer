@@ -108,7 +108,7 @@ class RepozerQueryManager():
             
             # Ictp: custom case
             if text.lower().startswith('smr'):
-                self.setQuery( Any('keywords', text.strip()) )
+                self.setQuery( Any('keywords', text.replace(" ", "")) )
                 return
                        
             # WHERE: specify where to search       
