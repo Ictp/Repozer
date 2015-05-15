@@ -23,6 +23,7 @@ class SearchHook(HTTPAPIHook):
         'subcontributions': 100,
         'sessions': 100,
     }
+    NO_CACHE = True
 
     def _getParams(self):
         super(SearchHook, self)._getParams()
