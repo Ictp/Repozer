@@ -123,6 +123,7 @@ availableKeywords = [
 'Plasma Focus Project',
 'Plasma Physics (including Fusion)',
 'Policy and Planning',
+'Prize_Ceremony',
 'Quantitative Life Sciences',
 'Quantum Phenomena (including Quantum Computation)',
 'Radiopropagation',
