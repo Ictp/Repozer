@@ -180,7 +180,7 @@ class RepozerQueryManager():
             self.addQuery( Le('startDate',today_ts) & Ge('endDate',end_today_ts) )
             
         elif params.has_key('todaybeyond'):
-            if params['todaybeyond'] == '':
+            if params['todaybeyond'] == '' or params['todaybeyond'] == '1':
                 td = time.strftime("%Y/%m/%d").split('/')
             else:                
                 td = params['todaybeyond'].split('/')
